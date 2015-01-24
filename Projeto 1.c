@@ -137,7 +137,8 @@ void remVacina()
 void cadCachorro() {
 
 	FILE *arq2;
-	struct ap2Sruct aux;
+     	struct ap2Struct aux,aux2;
+     	int opt;
 
 	arq2 = fopen("Arquivo1","r+");
 
@@ -146,9 +147,25 @@ void cadCachorro() {
 
 	while (1) {
 		printf("CADASTRO DE CACHORRO\n");
-
-		printf("\nQual a raca do cachorro? ");
-		scanf("%s",&aux.nomeCachorro);
-		printf("\nQual o nome do cachorro? ");
-		scanf("%s",&aux.raca);
+     
+     		printf("\nQual a raca do cachorro? ");
+     		scanf("%s",&aux.nomeCachorro);
+     		printf("\nQual o nome do cachorro? ");
+     		scanf("%s",&aux.raca);
+     
+     		printf("Confirma? (1=Sim 0=Nao)");
+     		scanf("%d",&opt);
+     		switch (opt){
+                  	case 0:
+                       		break;
+                	case 1:
+                       		fwrite(&aux.nomeCachorro, sizeof(aux.nomeCachorro), 1, arq2);
+                       		fwrite(&aux.raca, sizeof(aux.raca), 1, arq2);
+                       		fseek(arq2,0,0);
+		                fread(&aux2.nomeCachorro, sizeof(aux.nomeCachorro), 1 ,arq2);
+                       		fread(&aux2.raca, sizeof(aux.raca), 1 ,arq2); 
+                       		printf("Raca: %s\n",aux2.raca);                        
+                       		printf("Nome: %s\n",aux2.nomeCachorro); 
+                       		break;
+                  }
 }
