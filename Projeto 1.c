@@ -1,12 +1,10 @@
 //	Projeto 1 - Estrutura de Dados II
-//	Nomes:	Bruno Fouz Valente
-//			Pedro Ivo Monteiro Privatto
+//	Alunos: Bruno Fouz Valente e Pedro Ivo Monteiro Privatto
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <conio.h>
 
 //================================================================
 //===========================DECLARAÇÕES==========================
@@ -67,8 +65,7 @@ int main() {
 	printf("\nGravoooou2\n");
 	gravaIndice(lista);
 	printf("\nGravoooou3\n");
-	getch();
-	system("pause");
+
 	return 0;
 }
 
@@ -78,7 +75,7 @@ int main() {
 
 void menu() {
 
-	int opt;
+	char opt;
 
 	printf("(1) Cadastrar nova vacina\n");
 	printf("(2) Alterar dados de vacina existente\n");
@@ -88,29 +85,29 @@ void menu() {
 //	printf("(6) Remover dados de cachorro\n\n");
 	printf("(7) Sair\n\n");
 	printf("Escolha uma opcao: ");
-	scanf("%d", &opt);
+
+	scanf("%s", &opt);
 
 	switch(opt) {
-
-		case 1:
+		case '1':
 			cadVacina();
-			menu();			
+			menu();
 			break;
-		case 2:
+		case '2':
 //			altVacina();
 			break;
-		case 3:
+		case '3':
 //			remVacina();
 			break;
-		case 4:
+		case '4':
 			cadCachorro();
-			menu();	
+			menu();
 			break;
-		case 5:
+		case '5':
 			break;
-		case 6:
+		case '6':
 			break;
-		case 7:
+		case '7':
 			system("cls");
 			printf("Fechando o programa...\n");
 			break;
@@ -181,7 +178,6 @@ void cadVacina() {
 //			break;
 //		}
     printf("\nCadastro realizado com sucesso!!!");
-    getch();
 }
 
 //Function para cadastrar um novo cachorro.
@@ -356,5 +352,4 @@ void imprimeIndice(struct indexStruct* lista) {
         printf("%d \n", lista->inicio);
         lista = lista->prox;
     }
-    getch();
 }
