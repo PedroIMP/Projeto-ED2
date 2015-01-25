@@ -87,6 +87,7 @@ void menu() {
 	printf("Escolha uma opcao: ");
 
 	scanf("%s", &opt);
+	getchar();
 
 	switch(opt) {
 		case '1':
