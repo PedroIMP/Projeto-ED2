@@ -36,6 +36,8 @@ FILE* indexArq1;
 //===========================PROTOTYPES===========================
 //================================================================
 
+struct indice1 lista;
+
 void menu();
 void cadVacina();
 void altVacina();
@@ -45,9 +47,12 @@ void cadCachorro();
 //void remCachorro();
 void buscaCachorro(int);
 void geraIndice();
-void leIndice(struct indexStruct* listaTemp);
-void gravaIndice(struct indexStruct* lista);
-void imprimeIndice(struct indexStruct* lista);
+void verificaIndice();
+void carregaIndice(struct indexStruct **lista);
+void salvaIndice(struct indexStruct *lista);
+void leIndice(struct indexStruct **lista);
+void atualizaIndice(struct indexStruct **lista, struct ap1Struct aux, int tamanho);
+void imprimeIndice(struct indexStruct *lista);
 
 //================================================================
 //=============================MAIN===============================
@@ -213,9 +218,9 @@ void cadCachorro() {
 		case 0:
 			break;
 		case 1:                                             
-			fwrite(&aux, sizeof(ap2), 1, arq2);	//Salva os campos do registro aux no arquivo
-			fseek(arq2, -sizeof(ap2),2);	//Posiciona o arquivo 1 registro para trás
-			fread(&aux2, sizeof(ap2), 1 ,arq2);	//Recupera o ultimo registro para aux2
+			fwrite(&aux, sizeof(ap2), 1, arq2);	// Salva os campos do registro aux no arquivo
+			fseek(arq2, -sizeof(ap2), 2);	// Posiciona o arquivo 1 registro para trás
+			fread(&aux2, sizeof(ap2), 1 ,arq2);	// Recupera o ultimo registro para aux2
 			printf("\nCodigo do cachorro: %d",aux2.codCachorro);                                         
 			printf("\nNome: %s",aux2.nomeCachorro);                       
 			printf("\nRaca: %s",aux2.raca);                                  
@@ -234,12 +239,12 @@ void buscaCachorro(int cod) {
 
 	FILE *buscaCao = fopen("Arquivo2.bin","r");
 
-	if (buscaCao == NULL) {		//Verificação de existência do arquivo
+	if (buscaCao == NULL) {		// Verificação de existência do arquivo
 		printf("Arquivo de cachorros nao existe!!!");         
 	}	//Fim do primeiro if 
 
 	else {
-		pos = (cod)*52; //Código do cachorro multiplicado pelo tamanho de cada registro
+		pos = (cod)*52; // Código do cachorro multiplicado pelo tamanho de cada registro
 
 		fseek(buscaCao,0,2);
 		tamArq = (int) ftell(buscaCao);
@@ -258,7 +263,7 @@ void buscaCachorro(int cod) {
 	} //Fim do primeiro else
 }
 
-void verificaArqIndex() {
+void verificaIndice() {
     lista = NULL;
     arq1 = fopen("Arquivo1.bin", "r+b");
     if (arq1 == NULL) {
@@ -280,7 +285,7 @@ void verificaArqIndex() {
 }
 
 
-void carregarListaIndice(struct indexStruct **lista) {
+void carregaIndice(struct indexStruct **lista) {
     arq1 = fopen("Arquivo1.bin", "r+b");
 
     *lista = NULL;
@@ -318,7 +323,7 @@ void carregarListaIndice(struct indexStruct **lista) {
 }
 
 
-void gravarIndice(struct indexStruct *lista) {
+void salvaIndice(struct indexStruct *lista) {
     indexArq1 = fopen("indexArq1.bin", "w+b");
 
     while (lista != NULL) {
@@ -331,7 +336,7 @@ void gravarIndice(struct indexStruct *lista) {
 }
 
 
-void lerIndice(struct indexStruct **lista) {
+void leIndice(struct indexStruct **lista) {
     indexArq1 = fopen("indexArq1.bin", "r+b");
 
     *lista = malloc(sizeof(indice1));
@@ -362,7 +367,6 @@ void lerIndice(struct indexStruct **lista) {
     fclose(indexArq1);
 }
 
-
 void atualizaIndice(struct indexStruct **lista, struct ap1Struct aux, int tamanho) {
     struct indexStruct *listaAux = malloc(sizeof(indice1));
     if (*lista == NULL)
@@ -374,7 +378,7 @@ void atualizaIndice(struct indexStruct **lista, struct ap1Struct aux, int tamanh
     *lista = listaAux;
 }
 
-void imprimirIndice(struct indexStruct *lista) {
+void imprimeIndice(struct indexStruct *lista) {
     while (lista != NULL) {
         printf("%d ", lista->codControle);
         printf("%d \n", lista->inicio);
