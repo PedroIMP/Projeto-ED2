@@ -1,12 +1,10 @@
 //	Projeto 1 - Estrutura de Dados II
-//	Nome: Bruno Fouz Valente
-//	Nome: Pedro Ivo Monteiro Privatto
+//	Alunos: Bruno Fouz Valente e Pedro Ivo Monteiro Privatto
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <conio.h>
 
 //================================================================
 //===========================DECLARAÇÕES==========================
@@ -29,8 +27,6 @@ struct indexStruct{
 	int inicio;
 	struct indexStruct *prox;
 } indice1;
-
-
 
 FILE* arq1;
 FILE* arq2;
@@ -57,21 +53,13 @@ void leIndice(struct indexStruct **lista);
 void atualizaIndice(struct indexStruct **lista, struct ap1Struct aux, int tamanho);
 void imprimeIndice(struct indexStruct *lista);
 
-
-
 //================================================================
 //=============================MAIN===============================
 //================================================================
 
 int main() {
-	
     srand(time(NULL));
-
-	
 	menu();
-	
-	getch();
-	system("pause");
 	return 0;
 }
 
@@ -80,71 +68,66 @@ int main() {
 //================================================================
 
 void menu() {
-	int opt;
 
-	do{
-	   system("cls");
-	   printf("==========================================\n");
-	   printf("(1) Cadastrar nova vacina                 |\n");
-	   printf("==========================================\n");
-	   printf("(2) Alterar dados de vacina existente     |\n");
-	   printf("==========================================\n");
-	   printf("(3) Remover dados de vacina               |\n");
-	   printf("==========================================\n");
-	   printf("(4) Cadastrar novo cachorro               |\n");
-	   printf("==========================================\n");
-	   //printf("(5) Alterar dados de cachorro existente\n");
-	   //printf("(6) Remover dados de cachorro\n\n");
-	   printf("(7) Sair                                  |\n");
-	   printf("==========================================\n");
-	   printf("Escolha uma opcao: ");
-	   scanf("%d",&opt);
-    //}while (opt !=7);
+	char opt;
+
+	printf("(1) Cadastrar nova vacina\n");
+	printf("(2) Alterar dados de vacina existente\n");
+	printf("(3) Remover dados de vacina\n");
+	printf("(4) Cadastrar novo cachorro\n");
+//	printf("(5) Alterar dados de cachorro existente\n");
+//	printf("(6) Remover dados de cachorro\n\n");
+	printf("(7) Sair\n\n");
+	printf("Escolha uma opcao: ");
+
+	scanf("%s", &opt);
+	getchar();
+
 	switch(opt) {
-
-		case 1:
+		case '1':
 			cadVacina();
-			menu();			
+			menu();
 			break;
-		case 2:
-			//altVacina();
+		case '2':
+//			altVacina();
 			break;
-		case 3:
-			//remVacina();
+		case '3':
+//			remVacina();
 			break;
-		case 4:
+		case '4':
 			cadCachorro();
-			menu();	
+			menu();
 			break;
-		case 5:
+		case '5':
 			break;
-		case 6:
+		case '6':
 			break;
-		case 7:
-			system("cls");
+		case '7':
 			printf("Fechando o programa...\n");
 			break;
-	} //Fim do switch
-	}while (opt !=7);
+		default:
+			printf("Opcao invalida!");
+			menu();
+			break;
+	}
 }
 
 void cadVacina() {
-	FILE *arq1;
-	struct ap1Struct aux,aux2;
+
+	struct ap1Struct aux, aux2;
 	int opt;
 	char buffer[60];
 
-	arq1 = fopen("Arquivo1.bin","r+b");
+	FILE *arq1 = fopen("Arquivo1.bin","r+b");
 
 	if (arq1 == NULL) { //Verificação de existência do arquivo
         arq1 = fopen("Arquivo1.bin","w+b"); //Criação do arquivo,caso não exista
 	}
 
-	system("cls");
 	printf("CADASTRO DE NOVA VACINACAO\n");
 
 //	printf("\nO animal ja e cadastrado? (1=Sim 0=Nao)");
-//	scanf("%d",&opt);
+//	scanf("%d", &opt);
 
 //	switch(opt) {
 //		case 0:
@@ -188,16 +171,16 @@ void cadVacina() {
 //			break;
 //		}
     printf("\nCadastro realizado com sucesso!!!");
-    getch();
 }
 
-void cadCachorro() {
 //Function para cadastrar um novo cachorro.
-	FILE *arq2;
+
+void cadCachorro() {
+
 	struct ap2Struct aux,aux2;
 	int opt;
 
-	arq2 = fopen("Arquivo2.bin","r+b");
+	FILE *arq2 = fopen("Arquivo2.bin","r+b");
 
 	if (arq2 == NULL) {	//Verificação de existência do arquivo
 		arq2 = fopen("Arquivo2.bin","w+b");	//Criação do arquivo,caso não exista        
@@ -205,7 +188,6 @@ void cadCachorro() {
 	
 	fseek(arq2,0,2);
 
-	system("cls");   
 	printf("CADASTRO DE CACHORRO\n");
 	aux.codCachorro = ftell(arq2)/sizeof(ap2);
 	printf("\nCodigo do cachorro: %d",aux.codCachorro);
@@ -222,9 +204,9 @@ void cadCachorro() {
 		case 0:
 			break;
 		case 1:                                             
-			fwrite(&aux, sizeof(ap2), 1, arq2);	//Salva os campos do registro aux no arquivo
-			fseek(arq2, -sizeof(ap2),2);	//Posiciona o arquivo 1 registro para trás
-			fread(&aux2, sizeof(ap2), 1 ,arq2);	//Recupera o ultimo registro para aux2
+			fwrite(&aux, sizeof(ap2), 1, arq2);	// Salva os campos do registro aux no arquivo
+			fseek(arq2, -sizeof(ap2), 2);	// Posiciona o arquivo 1 registro para trás
+			fread(&aux2, sizeof(ap2), 1 ,arq2);	// Recupera o ultimo registro para aux2
 			printf("\nCodigo do cachorro: %d",aux2.codCachorro);                                         
 			printf("\nNome: %s",aux2.nomeCachorro);                       
 			printf("\nRaca: %s",aux2.raca);                                  
@@ -234,19 +216,21 @@ void cadCachorro() {
 	fclose(arq2);
 }
 
+//Function que busca um cachorro pelo codigo fornecido.
+
 void buscaCachorro(int cod) {
-//Function que busca um cachorro pelo codigo fornecido. 
-	FILE *buscaCao;
+
 	struct ap2Struct aux;
 	int pos,tamArq;
 
-	buscaCao = fopen("Arquivo2.bin","r");
-	if (buscaCao == NULL) {		//Verificação de existência do arquivo
+	FILE *buscaCao = fopen("Arquivo2.bin","r");
+
+	if (buscaCao == NULL) {		// Verificação de existência do arquivo
 		printf("Arquivo de cachorros nao existe!!!");         
 	}	//Fim do primeiro if 
 
 	else {
-		pos = (cod)*52; //Código do cachorro multiplicado pelo tamanho de cada registro
+		pos = (cod)*52; // Código do cachorro multiplicado pelo tamanho de cada registro
 
 		fseek(buscaCao,0,2);
 		tamArq = (int) ftell(buscaCao);
@@ -264,7 +248,6 @@ void buscaCachorro(int cod) {
 		} //Fim do segundo else
 	} //Fim do primeiro else
 }
-
 
 void verificaIndice() {
     lista = NULL;
@@ -370,13 +353,12 @@ void leIndice(struct indexStruct **lista) {
     fclose(indexArq1);
 }
 
-
 void atualizaIndice(struct indexStruct **lista, struct ap1Struct aux, int tamanho) {
     struct indexStruct *listaAux = malloc(sizeof(indice1));
     if (*lista == NULL)
         listaAux->inicio = 4;
     else
-        listaAux->inicio = (*lista)->inicio + tamanho + 4;
+        listaAux->inicio = (*lista)->inicio + tamanho;
     listaAux->codControle = aux.codControle;
     listaAux->prox = *lista;
     *lista = listaAux;
@@ -388,5 +370,4 @@ void imprimeIndice(struct indexStruct *lista) {
         printf("%d \n", lista->inicio);
         lista = lista->prox;
     }
-    getch();
 }
