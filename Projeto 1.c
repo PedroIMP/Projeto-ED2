@@ -358,7 +358,7 @@ void atualizaIndice(struct indexStruct **lista, struct ap1Struct aux, int tamanh
     if (*lista == NULL)
         listaAux->inicio = 4;
     else
-        listaAux->inicio = (*lista)->inicio + tamanho;
+        listaAux->inicio = (*lista)->inicio + tamanho + 4;
     listaAux->codControle = aux.codControle;
     listaAux->prox = *lista;
     *lista = listaAux;
