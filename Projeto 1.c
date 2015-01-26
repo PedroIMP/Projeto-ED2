@@ -250,26 +250,32 @@ void buscaCachorro(int cod) {
 }
 
 void verificaIndice() {
-    lista = NULL;
-    arq1 = fopen("Arquivo1.bin", "r+b");
-    if (arq1 == NULL) {
-        arq1 = fopen("Arquivo1.bin", "w+b");
-        indexArq1 = fopen("indexArq1.bin", "w+b");
-    }
-    else {
-            fseek(arq1,0,2);
-            if (ftell(arq1) != 0) {
-                indexArq1 = fopen("indexArq1.bin", "r+b");
-                if (indexArq1 == NULL) {
-                    indexArq1 = fopen("indexArq1.bin", "w+b");
-                    carregaIndice(&lista);
-                }
-                else
-                    leIndice(&lista);
-            }
-    }
+	lista = NULL;
+	arq1 = fopen("Arquivo1.bin", "r+b");
+	if (arq1 == NULL) {
+		arq1 = fopen("Arquivo1.bin", "w+b");
+		int n = -1;
+		fwrite(&n,sizeof(int),1,arq1);
+		fclose(arq1);
+		indexArq1 = fopen("indexArq1.bin", "w+b");
+	} else {
+		fseek(arq1,0,2);
+		if (ftell(arq1) != 4) {
+			indexArq1 = fopen("indexArq1.bin", "r+b");
+			if (indexArq1 == NULL) {
+				indexArq1 = fopen("indexArq1.bin", "w+b");
+				carregaIndice(&lista);
+			} else {
+				fseek(arq1,0,2);
+				if ( (ftell(arq1)) != 0) {
+					lista = NULL;
+				} else {
+					leIndice(&lista);
+				}
+			}
+		}
+	}
 }
-
 
 void carregaIndice(struct indexStruct **lista) {
     arq1 = fopen("Arquivo1.bin", "r+b");
