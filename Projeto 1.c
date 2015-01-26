@@ -258,99 +258,127 @@ void buscaCachorro(int cod) {
 	} //Fim do primeiro else
 }
 
-//Function que gera indíces em memória principal.
-
-void geraIndice(struct indexStruct* lista) {
-      
-	struct indexStruct* listaAux = lista;
-    
-	FILE *arq1 = fopen("Arquivo1.bin", "r+b");
-
-	if(arq1 == NULL) {	//Verificação de existência do arquivo
-		arq1 = fopen("Arquivo1.bin", "w+b");	//Criação do arquivo,caso não exista 
-	}
-
-	indexArq1 = fopen("indexArq1.bin", "r+b");
-	if(indexArq1 == NULL) {	//Verificação de existência do arquivo
-		indexArq1 = fopen("indexArq1.bin", "w+b");	//Criação do arquivo,caso não exista
-    
-        int tam,cod,pos = 0;
-        char flag;
-
-        fseek(arq1,0,2);
-        int tamArq = ftell(arq1);	//Le o tamanho do arquivo.
-        fseek(arq1,0,0);
-
-        do {
-            fread(&tam, sizeof(int), 1, arq1); 		//Le o primeiro inteiro, que é o tamanho do registo.
-            fread(&flag, sizeof(char), 1, arq1);	//Le o char que represanta se é valido ou não (* ou !).
-
-            if (flag == '*') {	//Registro válido.
-                fread(&cod, sizeof(int), 1, arq1);	//Le o CodControle do Arquivo para uma variavel.
-                listaAux->codControle = cod;	//Atribui o CodControle a um campo da lista.
-                listaAux->inicio = pos;	//Atribui a posição a um campo da lista.
-                listaAux->prox = malloc(sizeof(indice1));	//Aloca memória para o próximo da lista.
-                listaAux = listaAux->prox;	//"Anda" com a lista.
-                fseek(arq1,(tam-sizeof(char)-sizeof(int)),1);
+void verificaArqIndex() {
+    lista = NULL;
+    arq1 = fopen("Arquivo1.bin", "r+b");
+    if (arq1 == NULL) {
+        arq1 = fopen("Arquivo1.bin", "w+b");
+        indexArq1 = fopen("indexArq1.bin", "w+b");
+    }
+    else {
+            fseek(arq1,0,2);
+            if (ftell(arq1) != 0) {
+                indexArq1 = fopen("indexArq1.bin", "r+b");
+                if (indexArq1 == NULL) {
+                    indexArq1 = fopen("indexArq1.bin", "w+b");
+                    carregarListaIndice(&lista);
+                }
+                else
+                    lerIndice(&lista);
             }
-            else {	//Registro inválido.
-                fseek(arq1,(tam-sizeof(char)),1);
-            }
+    }
+}
 
-            pos += tam + sizeof(int);
 
-        } while (pos < tamArq);
-		
-  		listaAux->prox = NULL;
-  		
-    } else leIndice(lista);	//Caso indexArq1.bin exista.
+void carregarListaIndice(struct indexStruct **lista) {
+    arq1 = fopen("Arquivo1.bin", "r+b");
+
+    *lista = NULL;
+
+    int pos = 0;
+    int tam, cod;
+    char flag;
+
+    fseek(arq1,0,2);
+    int tamArq = ftell(arq1);
+    fseek(arq1,0,0);
+
+    do {
+        fread(&tam, sizeof(int), 1, arq1);
+        fread(&flag, sizeof(char), 1, arq1);
+
+        if (flag == '*') {
+            fread(&cod, sizeof(int), 1, arq1);
+            struct indexStruct *listaAux = malloc(sizeof(indice1));
+            listaAux->prox = *lista;
+            *lista = listaAux;
+            (*lista)->codControle = cod;
+            (*lista)->inicio = pos;
+            fseek(arq1,(tam-sizeof(char)-sizeof(int)),1);
+        }
+        else {
+            fseek(arq1,(tam-sizeof(char)),1);
+        }
+
+        pos += tam + sizeof(int);
+
+    } while (pos < tamArq);
 
     fclose(arq1);
-
 }
 
-//	Function que le os índices gerados anteriormente.
 
-void leIndice(struct indexStruct* listaTemp) {
+void gravarIndice(struct indexStruct *lista) {
+    indexArq1 = fopen("indexArq1.bin", "w+b");
 
-    struct indexStruct* lista = listaTemp;
-    int cod,pos,cont = 0;
-
-    fseek(indexArq1,0,2);
-    int tamArq = (ftell(indexArq1)/(sizeof(int)*2));	//Le o número de indices (tamanho total/tamanho registro).
-    fseek(indexArq1,0,0);
-
-    while(cont < tamArq) {
-        fread(&cod,sizeof(int),1,indexArq1);
-        fread(&pos,sizeof(int),1,indexArq1);
-        lista->codControle = cod;
-        lista->inicio = pos;
-        lista->prox = malloc(sizeof(indice1));
-        lista = lista->prox;
-        cont++;
-    }
-
-    lista->prox = NULL;
-}
-
-//	Function que grava em disco os índices gerados anteriormente.
-
-void gravaIndice(struct indexStruct* lista) {
-
-    while (lista->prox != NULL) {
-		  printf("\nGravoooou\n");
+    while (lista != NULL) {
         fwrite(&lista->codControle, sizeof(int), 1, indexArq1);
         fwrite(&lista->inicio, sizeof(int), 1, indexArq1);
-        lista = lista->prox;	//"Anda" com a lista.
+        lista = lista->prox;
     }
 
     fclose(indexArq1);
 }
 
-void imprimeIndice(struct indexStruct* lista) {
-    while (lista->prox != NULL) {
+
+void lerIndice(struct indexStruct **lista) {
+    indexArq1 = fopen("indexArq1.bin", "r+b");
+
+    *lista = malloc(sizeof(indice1));
+    struct indexStruct *listaAux = *lista;
+
+    int cod, pos;
+    int cont = 1;
+
+    fseek(indexArq1,0,2);
+    int tamArq = (ftell(indexArq1)/(sizeof(int)*2));
+    fseek(indexArq1,0,0);
+
+    fread(&cod,sizeof(int),1,indexArq1);
+    fread(&pos,sizeof(int),1,indexArq1);
+    listaAux->codControle = cod;
+    listaAux->inicio = pos;
+    while(cont < tamArq) {
+        fread(&cod,sizeof(int),1,indexArq1);
+        fread(&pos,sizeof(int),1,indexArq1);
+        listaAux->prox = malloc(sizeof(indice1));
+        listaAux = listaAux->prox;
+        listaAux->codControle = cod;
+        listaAux->inicio = pos;
+        cont++;
+    }
+    listaAux->prox = NULL;
+
+    fclose(indexArq1);
+}
+
+
+void atualizaIndice(struct indexStruct **lista, struct ap1Struct aux, int tamanho) {
+    struct indexStruct *listaAux = malloc(sizeof(indice1));
+    if (*lista == NULL)
+        listaAux->inicio = 4;
+    else
+        listaAux->inicio = (*lista)->inicio + tamanho;
+    listaAux->codControle = aux.codControle;
+    listaAux->prox = *lista;
+    *lista = listaAux;
+}
+
+void imprimirIndice(struct indexStruct *lista) {
+    while (lista != NULL) {
         printf("%d ", lista->codControle);
         printf("%d \n", lista->inicio);
         lista = lista->prox;
     }
+    getch();
 }
