@@ -377,3 +377,5 @@ void imprimeIndice(struct indexStruct *lista) {
         lista = lista->prox;
     }
 }
+
+// TESTE EAIIIIIIIIIIII
