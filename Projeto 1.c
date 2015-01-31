@@ -22,7 +22,7 @@ typedef struct ap2Struct {
 	int codCachorro;
 	char raca[15], nomeCachorro[30];
 } ap2;
-         
+
 typedef struct indexStruct {
 	int codControle, inicio;
 	struct indexStruct *prox;
@@ -38,13 +38,10 @@ indice1 *lista;
 //	Protótipos
 
 void menu();
-void menuAlterarVacina();
 void cadVacina();
 void altVacina();
 void remVacina();
 void cadCachorro();
-//void altCachorro();
-//void remCachorro();
 void buscaCachorro(int);
 void verificaIndice();
 void carregaIndice(struct indexStruct **lista);
@@ -52,18 +49,23 @@ void salvaIndice(struct indexStruct *lista);
 void leIndice(struct indexStruct **lista);
 void atualizaIndice(struct indexStruct **lista, struct ap1Struct aux, int tamanho);
 void imprimeIndice(struct indexStruct *lista);
+int obterOffset(int tam);
+void setInativo(int pos);
+void setOffset(int newOffset);
 
 //	Function principal (main) do programa
 
-int main() { ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    verificaIndice();
+int main() {
+	verificaIndice();
 
-	srand(time(NULL));
+    srand(time(NULL));
+
 	menu();
+
+	imprimeIndice(lista);
+    salvaIndice(lista);
 	return 0;
 }
-
-//	Function do menu principal
 
 void menu() { //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	char opt;
@@ -152,7 +154,6 @@ void menuAlterarVacina() { /////////////////////////////////////////////////////
 }
 
 //	Function para o cadastro de vacinas
-
 void cadVacina() { ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	struct ap1Struct aux, aux2;
 	int opt;
@@ -214,7 +215,6 @@ void cadVacina() { /////////////////////////////////////////////////////////////
 }
 
 //Function para cadastrar um novo cachorro.
-
 void cadCachorro() { /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	struct ap2Struct aux, aux2;
@@ -257,7 +257,6 @@ void cadCachorro() { ///////////////////////////////////////////////////////////
 }
 
 //Function que busca um cachorro pelo codigo fornecido.
-
 void buscaCachorro(int cod) { ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	struct ap2Struct aux;
@@ -289,59 +288,65 @@ void buscaCachorro(int cod) { //////////////////////////////////////////////////
 	} //Fim do primeiro else
 }
 
-void verificaIndice() { /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	lista = NULL;
-	arq1 = fopen("Arquivo1.bin", "r+b");
-	if (arq1 == NULL) {
-		arq1 = fopen("Arquivo1.bin", "w+b");
-		int n = -1;
-		fwrite(&n,sizeof(int),1,arq1);
-		fclose(arq1);
-		indexArq1 = fopen("indexArq1.bin", "w+b");
-	} else {
-		fseek(arq1,0,2);
-		if (ftell(arq1) != 4) {
-			indexArq1 = fopen("indexArq1.bin", "r+b");
-			if (indexArq1 == NULL) {
-				indexArq1 = fopen("indexArq1.bin", "w+b");
-				carregaIndice(&lista);
-			} else {
-				fseek(arq1,0,2);
-				if ( (ftell(arq1)) != 0) {
-					lista = NULL;
-				} else {
-					leIndice(&lista);
-				}
-			}
-		}
-	}
+void verificaIndice() {
+    lista = NULL;
+    arq1 = fopen("Arquivo1.bin", "r+b");
+    if (arq1 == NULL) {
+        arq1 = fopen("Arquivo1.bin", "w+b");
+        int n = -1;
+        fwrite(&n,sizeof(int),1,arq1);
+        fwrite(&n,sizeof(int),1,arq1);
+        fclose(arq1);
+        indexArq1 = fopen("Indice1.bin", "w+b");
+    }
+    else {
+            fseek(arq1,0,2);
+            if (ftell(arq1) != 4) {
+                indexArq1 = fopen("Indice1.bin", "r+b");
+                if (indexArq1 == NULL) {
+                    indexArq1 = fopen("Indice1.bin", "w+b");
+                    carregaIndice(&lista);
+                }
+                else
+                    fseek(arq1,0,2);
+                    if ( (ftell(arq1)) != 0)
+                       leIndice(&lista);
+                    else
+                        lista = NULL;
+            }
+    }
 }
 
-void carregaIndice(struct indexStruct **lista) { //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//certo
+void carregaIndice(struct indexStruct **lista) {
     arq1 = fopen("Arquivo1.bin", "r+b");
 
     *lista = NULL;
 
-    int pos = 0;
-    int tam, cod;
+    int pos = 8;
+    int tam = 0;
+    int cod = 0;
     char flag;
+    char codStr[20];
 
     fseek(arq1,0,2);
     int tamArq = ftell(arq1);
-    fseek(arq1,0,0);
+    fseek(arq1,8,0);
 
     do {
         fread(&tam, sizeof(int), 1, arq1);
         fread(&flag, sizeof(char), 1, arq1);
 
         if (flag == '*') {
-            fread(&cod, sizeof(int), 1, arq1);
+            fread(&codStr, tam - 2, 1, arq1);
+            strtok(&codStr,"|");
+            cod = atoi(&codStr);
             struct indexStruct *listaAux = malloc(sizeof(indice1));
             listaAux->prox = *lista;
             *lista = listaAux;
             (*lista)->codControle = cod;
             (*lista)->inicio = pos;
-            fseek(arq1,(tam-sizeof(char)-sizeof(int)),1);
+            fseek(arq1,1,1);
         }
         else {
             fseek(arq1,(tam-sizeof(char)),1);
@@ -354,9 +359,9 @@ void carregaIndice(struct indexStruct **lista) { ///////////////////////////////
     fclose(arq1);
 }
 
-
-void salvaIndice(struct indexStruct *lista) { ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    indexArq1 = fopen("indexArq1.bin", "w+b");
+//certo
+void salvaIndice(struct indexStruct *lista) {
+    indexArq1 = fopen("Indice1.bin", "w+b");
 
     while (lista != NULL) {
         fwrite(&lista->codControle, sizeof(int), 1, indexArq1);
@@ -367,14 +372,15 @@ void salvaIndice(struct indexStruct *lista) { //////////////////////////////////
     fclose(indexArq1);
 }
 
-
-void leIndice(struct indexStruct **lista) { ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    indexArq1 = fopen("indexArq1.bin", "r+b");
+//certo
+void leIndice(struct indexStruct **lista) {
+    indexArq1 = fopen("Indice1.bin", "r+b");
 
     *lista = malloc(sizeof(indice1));
     struct indexStruct *listaAux = *lista;
 
-    int cod, pos;
+    int cod;
+    int pos;
     int cont = 1;
 
     fseek(indexArq1,0,2);
@@ -399,21 +405,176 @@ void leIndice(struct indexStruct **lista) { ////////////////////////////////////
     fclose(indexArq1);
 }
 
-void atualizaIndice(struct indexStruct **lista, struct ap1Struct aux, int tamanho) { /////////////////////////////////////////////////////////////////////////////////
+//certo
+void atualizaIndice(struct indexStruct **lista, struct ap1Struct aux, int tamanho) {
     struct indexStruct *listaAux = malloc(sizeof(indice1));
-    if (*lista == NULL)
-        listaAux->inicio = 4;
-    else
-        listaAux->inicio = (*lista)->inicio + tamanho + 4;
+
+    listaAux->inicio = tamanho;
     listaAux->codControle = aux.codControle;
     listaAux->prox = *lista;
     *lista = listaAux;
 }
 
-void imprimeIndice(struct indexStruct *lista) { //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//certo
+void imprimeIndice(struct indexStruct *lista) {
     while (lista != NULL) {
         printf("%d ", lista->codControle);
         printf("%d \n", lista->inicio);
         lista = lista->prox;
     }
+    getch();
+}
+
+//certa mudar nome e printf
+void removeVacina(int codigo) {
+    struct indexStruct *listaTemp = lista;
+    struct indexStruct *listaAux = lista;
+    bool achou = false;
+
+	if (listaTemp != NULL) {
+        if (listaTemp->codControle == codigo) {
+            achou = true;
+        	setInativo(listaTemp->inicio);
+        	setOffset(listaTemp->inicio);
+        	lista = lista->prox;
+        	free(listaTemp);
+        }
+    	listaAux = listaTemp;
+    	listaTemp = listaTemp->prox;
+    	while (listaTemp != NULL) {
+            if (listaTemp->codControle == codigo) {
+     		    achou = true;
+                setInativo(listaTemp->inicio);
+                setOffset(listaTemp->inicio);
+                listaAux->prox = listaTemp->prox;
+                free(listaTemp);
+
+            }
+        	listaAux = listaTemp;
+        	listaTemp = listaTemp->prox;
+        }
+
+    }
+
+    if (!(achou))
+        printf("Nao ha nenhuma vacina de codigo %d cadastrada!\n", codigo);
+    else
+        printf("Vacina %d removida com sucesso!\n", codigo);
+
+    getch();
+}
+
+
+
+//certo
+int obterCodigo() {
+    arq1 = fopen("Arquivo1.bin", "r+b");
+    int cod;
+    
+    fread(&cod,sizeof(int),1,arq1);
+    cod++;
+    fseek(arq1,-sizeof(int),1);
+    fwrite(&cod,sizeof(int),1,arq1);
+    fclose(arq1);
+    return cod;
+}
+
+//certo
+int obterPos() {
+    arq1 = fopen("Arquivo1.bin", "r+b");
+    fseek(arq1,0,2);
+    int pos = ftell(arq1);
+    fclose(arq1);
+    return pos;
+}
+
+//debug
+void percorreListaRemocao() {
+    arq1 = fopen("Arquivo1.bin", "r+b");
+    int offset = 4;
+    
+    fseek(arq1,offset,0);
+    fread(&offset,sizeof(int),1,arq1);
+    printf("%d\n", offset);
+    fseek(arq1,offset + sizeof(char) + sizeof(int),0);
+    fread(&offset,sizeof(int),1,arq1);
+    printf("%d\n", offset);
+    fseek(arq1,offset + sizeof(char) + sizeof(int),0);
+    fread(&offset,sizeof(int),1,arq1);
+    printf("%d\n", offset);
+    fseek(arq1,offset + sizeof(char) + sizeof(int),0);
+    fread(&offset,sizeof(int),1,arq1);
+    printf("%d\n", offset);
+    fclose(arq1);
+    getch();
+}
+
+// certo trocar nome
+void setOffset(int newOffset) {
+    arq1 = fopen("Arquivo1.bin", "r+b");
+    bool fim = false;
+    int offset;
+    int offsetAux = -1;
+    
+    fseek(arq1,sizeof(int),0);
+    fread(&offset,sizeof(int),1,arq1);
+    while (!(fim)) {
+        if ((offset == -1) || (newOffset < offset)) {
+            fim = true;
+            fseek(arq1,(offsetAux + sizeof(int) + sizeof(char)),0);
+            fwrite(&newOffset,sizeof(int),1,arq1);
+            fseek(arq1,(newOffset + sizeof(int) + sizeof(char)),0);
+            fwrite(&offset,sizeof(int),1,arq1);
+            printf("%d\n", newOffset);
+            getch();
+        }
+        fseek(arq1,(offset + sizeof(int) + sizeof(char)),0);
+        offsetAux = offset;
+        fread(&offset,sizeof(int),1,arq1);
+    }
+    fclose(arq1);
+}
+
+// certo trocar nome
+void setInativo(int pos) {
+    arq1 = fopen("Arquivo1.bin", "r+b");
+    fseek(arq1,(pos + 4),0);
+    fwrite("!", sizeof(char), 1, arq1);
+    fclose(arq1);
+}
+
+
+//certo trocar nome
+int obterOffset(int tam) {
+    arq1 = fopen("Arquivo1.bin", "r+b");
+    int regTam;
+    int offset = 4;
+    int offsetAux = -1;
+    int offsetReturn;
+    fseek(arq1,offset,0);
+    fread(&offset,sizeof(int),1,arq1);
+    if (offset != -1) {
+        do {
+		   	printf("Teste 1");
+            fseek(arq1,offset,0);
+            fread(&regTam,sizeof(int),1,arq1);
+            if (tam <= regTam) {
+			   		printf("Teste 3");
+                fseek(arq1,1,1);
+                offsetReturn = offset;
+                fread(&offset,sizeof(int),1,arq1);
+                fseek(arq1,offsetAux + 5,0);
+                fwrite(&offset,sizeof(int),1,arq1);
+                getch();
+                fclose(arq1);
+                return offsetReturn;
+            }
+            fseek(arq1,1,1);
+            offsetAux = offset;
+            fread(&offset,sizeof(int),1,arq1);
+        } while (offset != -1);
+        printf("Teste 4");
+    }
+    fclose(arq1);
+    return offset;
 }
