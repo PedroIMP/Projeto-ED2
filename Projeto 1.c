@@ -87,18 +87,22 @@ void menu() { //////////////////////////////////////////////////////////////////
 			menu();
 			break;
 		case '2':
-//			altVacina();
+			menuAlterarVacina();
+			menu();
 			break;
 		case '3':
 //			remVacina();
+			menu();
 			break;
 		case '4':
 			cadCachorro();
 			menu();
 			break;
 		case '5':
+			menu();
 			break;
 		case '6':
+			menu();
 			break;
 		case '7':
 			printf("Fechando o programa...\n");
@@ -110,7 +114,7 @@ void menu() { //////////////////////////////////////////////////////////////////
 	}
 }
 
-void menuAlterarVacina() {
+void menuAlterarVacina() { /////////////////////////////////////////////////////////////////////////////////////////////////////////
 	char optAlt;
 	
 	printf("Qual dado você quer alterar?\n\n");
@@ -119,18 +123,30 @@ void menuAlterarVacina() {
 	printf("[3] Data de Vacinacao\n");
 	printf("[4] Responsavel pela Alteracao\n");
 	printf("[5] Sair\n\n");
-	printf("Escolha uma opcao:");
+	printf("Escolha uma opcao: ");
+	
+	scanf("%s", &optAlt);
+	getchar();
 	
 	switch(optAlt) {
 		case '1':
+			menuAlterarVacina();
 			//;
 		case '2':
+			menuAlterarVacina();
 			//;
 		case '3':
+			menuAlterarVacina();
 			//;
 		case '4':
+			menuAlterarVacina();
 			//;
 		case '5':
+			menu();
+			break;
+		default:
+			printf("Opcao invalida!");
+			menuAlterarVacina();
 			break;
 	}
 }
