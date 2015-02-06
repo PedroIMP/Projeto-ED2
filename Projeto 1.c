@@ -51,7 +51,7 @@ int numVacina, numCachorro, numIndex1, numIndex2;
 void menu();
 void menuCadastro();
 void menuRemocao();
-void menuAlteracao();
+void alteraVacina();
 void menuConsulta();
 void setInativo();
 void setOffset();
@@ -122,7 +122,7 @@ void menu() {
 				cadastroVacina();
 				break;
 			case '2':
-				menuAlteracao();
+				alteraVacina();
 				break;
 			case '3':
 				menuRemocao();
@@ -569,8 +569,7 @@ struct ap1Struct encontraRegistro(int pos) {
     fseek(dadosVacina,pos,0);
 
     fread(&tam,sizeof(int),1,dadosVacina);
-
-    //* maldito
+    
     fseek(dadosVacina,sizeof(char),1);
 
     fread(&str,tam-1,1,dadosVacina);
@@ -695,7 +694,7 @@ void atualizaIndex2(char *nomeAnt, char *nome, int codigo) {
 
 }
 
-void menuAlteracao() {
+void alteraVacina() {
      
     int menu, codigo, posAlteracao, tam;
     struct ap1Struct temporario;
