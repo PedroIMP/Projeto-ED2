@@ -376,16 +376,16 @@ int buscaCachorro(int codigo) {
 }
 
 void cadastroVacina() {
-    struct ap1Struct aux;
-    struct ap1Struct aux2;
+    struct ap1Struct temporario;
+    struct ap1Struct temporario2;
     char buffer[105];
-    aux.codControle = obterCodigo();
+    temporario.codControle = obterCodigo();
     do {
         printf("Menu de Cadastro de Vacinas\n\n");
-        printf("Codigo da vacina: %d\n\n", aux.codControle);
+        printf("Codigo da vacina: %d\n\n", temporario.codControle);
         printf("Codigo Cachorro: ");
-        scanf("%d", &aux.codCachorro);
-        if (buscaCachorro(aux.codCachorro) == -1) {
+        scanf("%d", &temporario.codCachorro);
+        if (buscaCachorro(temporario.codCachorro) == -1) {
             printf("\nCachorro nao encontrado!\n\n");
             bool sair = false;
             do {
@@ -405,50 +405,50 @@ void cadastroVacina() {
             } while (!sair);
             fflush(stdin);
         }
-    } while (buscaCachorro(aux.codCachorro) == -1);
+    } while (buscaCachorro(temporario.codCachorro) == -1);
     printf("\nNome Vacina: ");
-    scanf("%s", &aux.nomeVacina);
+    scanf("%s", &temporario.nomeVacina);
     printf("\nData: ");
-    scanf("%s", &aux.dataVacina);
+    scanf("%s", &temporario.dataVacina);
     printf("\nResponsavel pela Aplicacao: ");
-    scanf("%s", &aux.respAplic);
+    scanf("%s", &temporario.respAplic);
     fseek(arqIndex,0,0);
     fwrite("!",1,1,arqIndex);
-    adicionarVacina(aux, false);
+    adicionarVacina(temporario, false);
 }
 
 void cadastroCachorro() {
      
-    struct ap2Struct aux;
-    struct ap2Struct aux2;
+    struct ap2Struct temporario;
+    struct ap2Struct temporario2;
     printf("Menu de Cadastro de Cachorros\n\n");
     fseek(dadosCachorro,0,2);
-    aux.codCachorro = ftell(dadosCachorro)/sizeof(struct ap2Struct);
-    printf("%d\n", aux.codCachorro);
+    temporario.codCachorro = ftell(dadosCachorro)/sizeof(struct ap2Struct);
+    printf("%d\n", temporario.codCachorro);
     printf("Nome: ");
-    scanf("%s", aux.nomeCachorro);
+    scanf("%s", temporario.nomeCachorro);
     printf("\nRaca: ");
-    scanf("%s", aux.raca);
+    scanf("%s", temporario.raca);
     fseek(dadosCachorro,0,2);
-    fwrite(&aux, sizeof(struct ap2Struct), 1, dadosCachorro);
+    fwrite(&temporario, sizeof(struct ap2Struct), 1, dadosCachorro);
     fseek(dadosCachorro, -sizeof(struct ap2Struct),2);
-    fread(&aux2, sizeof(struct ap2Struct), 1, dadosCachorro);
-    printf("Codigo: %d\n",aux2.codCachorro);
-    printf("Raca: %s\n",aux2.raca);
-    printf("Nome: %s\n",aux2.nomeCachorro);
+    fread(&temporario2, sizeof(struct ap2Struct), 1, dadosCachorro);
+    printf("Codigo: %d\n",temporario2.codCachorro);
+    printf("Raca: %s\n",temporario2.raca);
+    printf("Nome: %s\n",temporario2.nomeCachorro);
      
 }
 
 void setOffset(int newOffset) {
     bool fim = false;
     int offset1;
-    int offsetAux = -1;
+    int offsettemporario = -1;
     fseek(dadosVacina,sizeof(int),0);
     fread(&offset1,sizeof(int),1,dadosVacina);
     while (!(fim)) {
         if ((offset1 == -1) || (newOffset < offset1)) {
             fim = true;
-            fseek(dadosVacina,(offsetAux + sizeof(int) + sizeof(char)),0);
+            fseek(dadosVacina,(offsettemporario + sizeof(int) + sizeof(char)),0);
             fwrite(&newOffset,sizeof(int),1,dadosVacina);
             fseek(dadosVacina,(newOffset + sizeof(int) + sizeof(char)),0);
             fwrite(&offset1,sizeof(int),1,dadosVacina);
@@ -456,7 +456,7 @@ void setOffset(int newOffset) {
              
         }
         fseek(dadosVacina,(offset1 + sizeof(int) + sizeof(char)),0);
-        offsetAux = offset1;
+        offsettemporario = offset1;
         fread(&offset1,sizeof(int),1,dadosVacina);
     }
 }
@@ -562,7 +562,7 @@ void menuRemocao() {
 }
 
 struct ap1Struct encontraRegistro(int pos) {
-    struct ap1Struct aux;
+    struct ap1Struct temporario;
     int tam, tamNew, temp, sum;
     char str[40];
 
@@ -577,34 +577,34 @@ struct ap1Struct encontraRegistro(int pos) {
     strtok(str,"|");
     sum = strlen(str) + 1;
     temp = atoi(str);
-    aux.codControle = temp;
+    temporario.codControle = temp;
 
     fseek(dadosVacina,pos+4+1+sum,0);
     fread(&str,tam-sum-1,1,dadosVacina);
     strtok(str,"|");
     sum += strlen(str) + 1;
     temp = atoi(str);
-    aux.codCachorro = temp;
+    temporario.codCachorro = temp;
 
     fseek(dadosVacina,pos+4+1+sum,0);
     fread(&str,tam-sum-1,1,dadosVacina);
     strtok(str,"|");
     sum += strlen(str) + 1;
-    strcpy(aux.nomeVacina,str);
+    strcpy(temporario.nomeVacina,str);
 
     fseek(dadosVacina,pos+4+1+sum,0);
     fread(&str,tam-sum-1,1,dadosVacina);
     strtok(str,"|");
     sum += strlen(str) + 1;
-    strcpy(aux.dataVacina,str);
+    strcpy(temporario.dataVacina,str);
 
     fseek(dadosVacina,pos+4+1+sum,0);
     fread(&str,tam-sum-1,1,dadosVacina);
     strtok(str,"|");
     sum += strlen(str) + 1;
-    strcpy(aux.respAplic,str);
+    strcpy(temporario.respAplic,str);
 
-    return aux;
+    return temporario;
 
 }
 
@@ -620,15 +620,15 @@ int buscaVacina(int codigo) {
     return -1;
 }
 
-int tamanhoRegistro(struct ap1Struct aux) {
+int tamanhoRegistro(struct ap1Struct temporario) {
     char buffer[105];
-    sprintf(buffer,"*%d|%d|%s|%s|%s|", aux.codControle, aux.codCachorro, &aux.nomeVacina,&aux.dataVacina,&aux.respAplic);
+    sprintf(buffer,"*%d|%d|%s|%s|%s|", temporario.codControle, temporario.codCachorro, &temporario.nomeVacina,&temporario.dataVacina,&temporario.respAplic);
     return strlen(buffer);
 }
 
-void reescreveVacina(struct ap1Struct aux, int offset1) {
+void reescreveVacina(struct ap1Struct temporario, int offset1) {
     char buffer[105];
-    sprintf(buffer,"*%d|%d|%s|%s|%s|", aux.codControle, aux.codCachorro, &aux.nomeVacina,&aux.dataVacina,&aux.respAplic);
+    sprintf(buffer,"*%d|%d|%s|%s|%s|", temporario.codControle, temporario.codCachorro, &temporario.nomeVacina,&temporario.dataVacina,&temporario.respAplic);
     int tamanho = strlen(buffer);
     fseek(dadosVacina,offset1 + sizeof(int),0);
     fwrite(buffer, sizeof(char), strlen(buffer), dadosVacina);
@@ -672,13 +672,13 @@ void atualizaIndex2(char *nomeAnt, char *nome, int codigo) {
             if (index2[count].offset2 == -1)
                 index2[numIndex2].offset2 = ref;
             else {
-                int aux = 0;
+                int temporario = 0;
                 int offset2 = index2[count].offset2;
                 do {
-                    aux = offset2;
+                    temporario = offset2;
                     offset2 = index1[offset2].offset2;
                 } while (offset2 != -1) ;
-                index1[aux].offset2 = ref;
+                index1[temporario].offset2 = ref;
             }
         }
         else
@@ -698,7 +698,7 @@ void atualizaIndex2(char *nomeAnt, char *nome, int codigo) {
 void menuAlteracao() {
      
     int menu, codigo, posAlteracao, tam;
-    struct ap1Struct aux;
+    struct ap1Struct temporario;
     printf("Menu de Alteracao de dados de Vacinacao\n\n");
     do {
         printf("Digite o codigo da vacina a ter dados alterado: \n");
@@ -712,47 +712,47 @@ void menuAlteracao() {
     printf("1. Codigo do Cachorro\n");
     printf("2. Nome da Vacina\n");
     printf("3. Data da Vacinacao\n");
-    printf("4. respAplic pela Aplicacao\n");
+    printf("4. Responsavel pela Aplicacao\n");
     printf("Escolha um campo para alterar: ");
     scanf("%d", &menu);
-    aux = encontraRegistro(posAlteracao);
+    temporario = encontraRegistro(posAlteracao);
     char nomeAnt[40];
     fseek(arqIndex,0,0);
     fwrite("!",1,1,arqIndex);
     switch (menu) {
         case 1:
                 printf("\nCodigo do Cachorro: ");
-                scanf("%d", &aux.codCachorro);
+                scanf("%d", &temporario.codCachorro);
                 break;
         case 2:
-                strcpy(nomeAnt,aux.nomeVacina);
+                strcpy(nomeAnt,temporario.nomeVacina);
                 printf("\nNome Vacina: ");
-                scanf("%s", &aux.nomeVacina);
-                atualizaIndex2(nomeAnt, aux.nomeVacina, aux.codControle);
+                scanf("%s", &temporario.nomeVacina);
+                atualizaIndex2(nomeAnt, temporario.nomeVacina, temporario.codControle);
                 ordenaIndices();
                 break;
         case 3:
                 printf("\nData: ");
-                scanf("%s", &aux.dataVacina);
+                scanf("%s", &temporario.dataVacina);
                 break;
         case 4:
                 printf("\nResponsavel pela Aplicacao: ");
-                scanf("%s", &aux.respAplic);
+                scanf("%s", &temporario.respAplic);
                 break;
     }
     fseek(dadosVacina,posAlteracao,0);
     fread(&tam,sizeof(int),1,dadosVacina);
-    if ((tamanhoRegistro(aux)) <= (tam)) {
-        reescreveVacina(aux,posAlteracao);
+    if ((tamanhoRegistro(temporario)) <= (tam)) {
+        reescreveVacina(temporario,posAlteracao);
     }
     else {
-        adicionarVacina(aux, true);
+        adicionarVacina(temporario, true);
     }
-    printf("Codigo Controle: %d\n", aux.codControle);
-    printf("Codigo Cachorro: %d\n", aux.codCachorro);
-    printf("Vacina: %s\n", aux.nomeVacina);
-    printf("Data: %s\n", aux.dataVacina);
-    printf("respAplic: %s\n", aux.respAplic);
+    printf("\nCodigo Controle: %d\n", temporario.codControle);
+    printf("Codigo Cachorro: %d\n", temporario.codCachorro);
+    printf("Vacina: %s\n", temporario.nomeVacina);
+    printf("Data: %s\n", temporario.dataVacina);
+    printf("Responsavel pela Aplicacao: %s\n", temporario.respAplic);
      
 }
 
@@ -812,11 +812,11 @@ void gravarIndex2() {
     fseek(arqIndex2,0,0);
     fseek(arqIndex2Offsets,0,0);
     int count = 0;
-    struct indice2Struct aux;
+    struct indice2Struct temporario;
     while (count <= numIndex2) {
-        strcpy(aux.nomeVacina,index2[count].nomeVacina);
-        aux.offset2 =  index2[count].offset2;
-        fwrite(&aux,sizeof(aux),1,arqIndex2);
+        strcpy(temporario.nomeVacina,index2[count].nomeVacina);
+        temporario.offset2 =  index2[count].offset2;
+        fwrite(&temporario,sizeof(temporario),1,arqIndex2);
         int offset1 = index2[count].offset2;
         while (offset1 != -1) {
             fwrite(&index1[offset1].codControle,sizeof(int),1,arqIndex2Offsets);
@@ -831,12 +831,12 @@ void lerIndex2() {
     fseek(arqIndex2,0,2);
     int tamArq = ftell(arqIndex2)/44;
     fseek(arqIndex2,0,0);
-    struct indice2Struct aux;
+    struct indice2Struct temporario;
 
     int count = 0;
 
     while (count < tamArq) {
-        fread(&aux,sizeof(aux),1,arqIndex2);
+        fread(&temporario,sizeof(temporario),1,arqIndex2);
          
         count++;
     }
@@ -860,16 +860,16 @@ void carregarIndice() {
     int tamArq = ftell(arqIndex2)/44;
     fseek(arqIndex2,0,0);
 
-    struct indice2Struct aux;
+    struct indice2Struct temporario;
 
     int codigo, offset2;
     int count = 0;
     while (count < tamArq) {
-        fread(&aux,sizeof(aux),1,arqIndex2);
+        fread(&temporario,sizeof(temporario),1,arqIndex2);
         numIndex2++;
-        strcpy(index2[numIndex2].nomeVacina, aux.nomeVacina);
-        index2[numIndex2].offset2 = aux.offset2;
-        int offset1 = aux.offset2;
+        strcpy(index2[numIndex2].nomeVacina, temporario.nomeVacina);
+        index2[numIndex2].offset2 = temporario.offset2;
+        int offset1 = temporario.offset2;
         while (offset1 != -1) {
             fread(&codigo,sizeof(int),1,arqIndex2Offsets);
             fread(&offset2,sizeof(int),1,arqIndex2Offsets);
@@ -945,13 +945,13 @@ void carregarListaIndice() {
                     if (index2[count].offset2 == -1)
                         index2[numIndex2].offset2 = numIndex1;
                     else {
-                        int aux = 0;
+                        int temporario = 0;
                         int offset2 = index2[count].offset2;
                     do {
-                        aux = offset2;
+                        temporario = offset2;
                         offset2 = index1[offset2].offset2;
                     } while (offset2 != -1) ;
-                    index1[aux].offset2 = numIndex1;
+                    index1[temporario].offset2 = numIndex1;
                     }
                 }
                 else
@@ -982,7 +982,7 @@ void compactarDadosVacina() {
     fseek(arqIndex,0,0);
     fwrite("!",1,1,arqIndex);
 
-    struct ap1Struct aux;
+    struct ap1Struct temporario;
     int pos = 8;
     int tam = 0;
     char flag;
