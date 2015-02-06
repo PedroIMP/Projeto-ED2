@@ -60,11 +60,11 @@ void carregarIndice();
 void carregarListaIndice();
 void cadastroCachorro();
 void inicializaVetores();
-void verificaArquivos();
+void abreArquivos();
 void imprimirIndex1();
 void imprimirIndex2();
 void cadastroVacina();
-void sortIndex2();
+void ordenaIndices();
 int obterCodigo();
 int obterOffset();
 void adicionaIndice();
@@ -79,7 +79,7 @@ void gravarIndex2();
 
 int main() {
     inicializaVetores();
-    verificaArquivos();
+    abreArquivos();
     menu();
 
     // DEBUG ////
@@ -152,7 +152,7 @@ void menu() {
 	} while (!fim);
 }
 
-void sortIndex2() {
+void ordenaIndices() {
     int count, count2, temp;
     char strTemp[40];
     count = 0;
@@ -176,7 +176,7 @@ void sortIndex2() {
 
 }
 
-void verificaArquivos() {
+void abreArquivos() {
     dadosCachorro = fopen("AP2.dat", "r+b");
     if (dadosCachorro == NULL) {
         dadosCachorro = fopen("AP2.dat", "w+b");
@@ -210,7 +210,7 @@ void verificaArquivos() {
                         arqIndex2 = fopen("indice2a.dat", "w+b");
                         arqIndex2Offsets = fopen("indice2b.dat", "w+b");
                         carregarListaIndice();
-                        sortIndex2();
+                        ordenaIndices();
                     }
                     else {
                         char flag;
@@ -220,7 +220,7 @@ void verificaArquivos() {
                             arqIndex2 = fopen("indice2a.dat", "r+b");
                             arqIndex2Offsets = fopen("indice2b.dat", "r+b");
                             carregarListaIndice();
-                            sortIndex2();
+                            ordenaIndices();
                         }
                         else {
                             carregarIndice();
@@ -344,7 +344,7 @@ void adicionarVacina(struct ap1Struct aux, bool atualizando) {
     printf("\n%d\n", tamanho);
     if (!atualizando) {
         adicionaIndice(aux,offset1);
-        sortIndex2();
+        ordenaIndices();
     }
     else
         mudaOffset(aux.codControle,offset1);
@@ -729,7 +729,7 @@ void menuAlteracao() {
                 printf("\nNome Vacina: ");
                 scanf("%s", &aux.nomeVacina);
                 atualizaIndex2(nomeAnt, aux.nomeVacina, aux.codControle);
-                sortIndex2();
+                ordenaIndices();
                 break;
         case 3:
                 printf("\nData: ");
@@ -1062,7 +1062,7 @@ void compactarDadosVacina() {
     dadosVacina = fopen("AP1.dat", "r+b");
 
     carregarListaIndice();
-    sortIndex2();
+    ordenaIndices();
     fclose(arqIndex);
     fclose(arqIndex2);
     fclose(arqIndex2Offsets);
