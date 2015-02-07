@@ -63,8 +63,6 @@ void carregarListaIndice();
 void cadastroCachorro();
 void inicializaVetores();
 void inicializaArquivos();
-void imprimirIndice1();
-void imprimirIndice2();
 void cadastroVacina();
 void ordenaIndices();
 int obterCodigo();
@@ -114,9 +112,7 @@ void menu() {
 		printf("[4] Remover dados de vacina\n");
 		printf("[5] Consulta de vacina\n");
 		printf("[6] Compactar arquivo de vacinas (AP1)\n");
-		printf("[7] Exibir Indice 1\n");
-		printf("[8] Exibir Indice 2\n\n");
-		printf("[9] Sair\n\n");
+		printf("[7] Sair\n\n");
 		printf("Escolha uma opcao: ");
 
 		scanf("%s", &opcao);
@@ -151,12 +147,6 @@ void menu() {
 				printf("Arquivo de vacinas (AP1) compactado com sucesso!\n");
 				break;
 			case '7':
-				imprimirIndice1();
-				break;
-			case '8':
-				imprimirIndice2();
-				break;
-			case '9':
 				printf("Fechando o programa...\n");
 				fim = true;
 				break;
@@ -820,31 +810,6 @@ void inicializaVetores() {
 
     for (i = 0; i <= 5000; i++) {
         index1[i].codControle = -1;
-    }
-}
-
-void imprimirIndice1() {
-    int contador = 0;
-
-    while (contador <= numIndex1) {
-        if (index1[contador].codControle != -1) {
-                printf("%d %d \n", index1[contador].codControle, index1[contador].offset1);
-		}
-        contador++;
-    }
-}
-
-void imprimirIndice2() {
-    int contador = 0;
-
-    while (contador <= numIndex2) {
-        printf("%s \n", index2[contador].nomeVacina);
-        int offset1 = index2[contador].offset2;
-        while (offset1 != -1) {
-            printf("        %d %d \n", index1[offset1].codControle, index1[offset1].offset1);
-            offset1 = index1[offset1].offset2;
-        }
-        contador++;
     }
 }
 
