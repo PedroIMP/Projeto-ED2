@@ -20,8 +20,8 @@
 struct ap1Struct {
 	int codControle, codCachorro;
 	char nomeVacina[40];
-	char dataVacina[10];
-	char respAplic[50];
+	char dataVacina[15];
+	char respAplic[45];
 };
 
 struct ap2Struct {
@@ -488,8 +488,6 @@ void setOffset(int newOffset) {
             fwrite(&newOffset, sizeof(int), 1, arqVacinas);
             fseek(arqVacinas, (newOffset + sizeof(int) + sizeof(char)), 0);
             fwrite(&offset1, sizeof(int), 1, arqVacinas);
-            printf("%d\n", newOffset);
-             
         }
         fseek(arqVacinas, (offset1 + sizeof(int) + sizeof(char)), 0);
         offsettemporario = offset1;
@@ -700,8 +698,8 @@ void atualizaIndex2(char *nomeAnt, char *nome, int codigo) {
 
 void alteraVacina() {
     int menu, codigo, posAlteracao, tam;
-
     struct ap1Struct temporario;
+
     printf("Alterar Dados de Vacina\n\n");
     do {
         printf("Digite o codigo da vacina: ");
@@ -732,14 +730,14 @@ void alteraVacina() {
                 scanf("%d", &temporario.codCachorro);
                 break;
         case 2:
-                strcpy(nomeAnt,temporario.nomeVacina);
-                printf("\nNome Vacina: ");
+                strcpy(nomeAnt, temporario.nomeVacina);
+                printf("\nNome da Vacina: ");
                 scanf("%s", &temporario.nomeVacina);
                 atualizaIndex2(nomeAnt, temporario.nomeVacina, temporario.codControle);
                 ordenaIndices();
                 break;
         case 3:
-                printf("\nData: ");
+                printf("\nData da Vacinacao: ");
                 scanf("%s", &temporario.dataVacina);
                 break;
         case 4:
@@ -759,60 +757,64 @@ void alteraVacina() {
 
     printf("\nCodigo Controle: %d\n", temporario.codControle);
     printf("Codigo Cachorro: %d\n", temporario.codCachorro);
-    printf("Vacina: %s\n", temporario.nomeVacina);
-    printf("Data: %s\n", temporario.dataVacina);
+    printf("Nome da Vacina: %s\n", temporario.nomeVacina);
+    printf("Datada Vacinacao: %s\n", temporario.dataVacina);
     printf("Responsavel pela Aplicacao: %s\n", temporario.respAplic);   
 }
 
 void consultaVacina() {
 	int codProcurado;
-	int RRN=0,tam,offsetAP1,soma;
-	bool achou=0;
+	int RRN = 0, tam, offsetAP1, soma;
+	bool achou = 0;
 	char str[100];
 
-	printf("Digite o codigo da vacina a ser procurada:");
-	scanf("%d",&codProcurado);
+	printf("Digite o codigo da vacina a ser procurada: ");
+	scanf("%d", &codProcurado);
 
-	while ((index1[RRN].codControle!=-1) && (achou!=true)){
-		if (index1[RRN].codControle ==codProcurado){
+	while ((index1[RRN].codControle != -1) && (!achou)) {
+		if (index1[RRN].codControle == codProcurado) {
 			achou = true;
 			offsetAP1 = index1[RRN].offset1;
-			fseek(arqVacinas,offsetAP1,0);
-			fread(&tam,sizeof(int),1,arqVacinas);
-			printf("\nO tamanho e %d\n",tam);//debug
+			fseek(arqVacinas, offsetAP1, 0);
+			fread(&tam, sizeof(int), 1, arqVacinas);
+			printf("\nO tamanho e %d\n", tam); //debug
 
-			fseek(arqVacinas,1,1);       
-			fread(&str,tam-1,1,arqVacinas);
-			strtok(str,"|");
+			fseek(arqVacinas, 1, 1);
+			fread(&str, tam - 1, 1, arqVacinas);
+			strtok(str, "|");
 			soma = strlen(str) + 1;
-			printf("\nCodigo da Vacina:%s",str);
+			printf("\nCodigo da Vacina: %s", str);
 
 			fseek(arqVacinas, offsetAP1 + 5 + soma, 0);
 			fread(&str, tam - soma - 1, 1, arqVacinas);
 			strtok(str, "|");
 			soma += strlen(str) + 1;
-			printf("\nCodigo do Cachorro:%s",str);
+			printf("\nCodigo do Cachorro: %s", str);
 
 			fseek(arqVacinas, offsetAP1 + 5 + soma, 0);
 			fread(&str, tam - soma - 1, 1, arqVacinas);
 			strtok(str, "|");
 			soma += strlen(str) + 1;
-			printf("\nNome da Vacina:%s",str);
+			printf("\nNome da Vacina: %s", str);
 
 			fseek(arqVacinas, offsetAP1 + 5 + soma, 0);
 			fread(&str, tam - soma - 1, 1, arqVacinas);
 			strtok(str, "|");
 			soma += strlen(str) + 1;
-			printf("\nData da vacina:%s",str);
+			printf("\nData da vacina: %s", str);
 
 			fseek(arqVacinas, offsetAP1 + 5 + soma, 0);
 			fread(&str, tam - soma - 1, 1, arqVacinas);
 			strtok(str, "|");
 			soma += strlen(str) + 1;
-			printf("\nResponsavel pela Aplicacao:%s\n",str);                                                    
+			printf("\nResponsavel pela Aplicacao: %s\n", str);                                                    
 		} else {
 			RRN++;
 		}
+	}
+
+	if (!achou) {
+		printf("Vacina referente ao codigo %d nao encontrada.\n\n", codProcurado);
 	}
 }
 
