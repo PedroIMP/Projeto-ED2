@@ -65,8 +65,8 @@ void carregarListaIndice();
 void cadastroCachorro();
 void inicializaVetores();
 void inicializaArquivos();
-void imprimirIndex1();
-void imprimirIndex2();
+void imprimirIndice1();
+void imprimirIndice2();
 void cadastroVacina();
 void ordenaIndices();
 int obterCodigo();
@@ -74,10 +74,10 @@ int obterOffset();
 void adicionaIndice();
 void mudaOffset();
 int buscaCachorro();
-void removeDoIndex2();
+void removeDoIndice2();
 void removeVacina();
-void gravarIndex();
-void gravarIndex2();
+void salvarIndice1();
+void salvarIndice2ab();
 
 //	Function principal (main) do programa
 
@@ -87,14 +87,14 @@ int main() {
 	menu();
 
 	// DEBUG ////
-	imprimirIndex1();
+	imprimirIndice1();
 
 	printf("\n");
 
-	imprimirIndex2();
+	imprimirIndice2();
 
-	gravarIndex();
-	gravarIndex2();
+	salvarIndice1();
+	salvarIndice2ab();
 	fclose(dadosCachorro);
 	fclose(dadosVacina);
 	fclose(arqIndice1);
@@ -362,7 +362,6 @@ int buscaCachorro(int codigo) {
 
     struct ap2Struct aux;
     int cont = 0;
-
     bool achou = false;
 
     while ( (cont < tamArq) && (!achou) ) {
@@ -384,6 +383,7 @@ void cadastroVacina() {
     struct ap1Struct temporario;
     struct ap1Struct temporario2;
     char buffer[105];
+
     temporario.codControle = obterCodigo();
     do {
         printf("Menu de Cadastro de Vacinas\n\n");
@@ -426,7 +426,6 @@ void cadastroVacina() {
 }
 
 void cadastroCachorro() {
-     
     struct ap2Struct temporario;
     struct ap2Struct temporario2;
     printf("Menu de Cadastro de Cachorros\n\n");
@@ -444,13 +443,13 @@ void cadastroCachorro() {
     printf("Codigo: %d\n",temporario2.codCachorro);
     printf("Raca: %s\n",temporario2.raca);
     printf("Nome: %s\n",temporario2.nomeCachorro);
-     
 }
 
 void setOffset(int newOffset) {
     bool fim = false;
     int offset1;
     int offsettemporario = -1;
+
     fseek(dadosVacina,sizeof(int),0);
     fread(&offset1,sizeof(int),1,dadosVacina);
     while (!(fim)) {
@@ -474,7 +473,7 @@ void setInativo(int pos) {
     fwrite("!", sizeof(char), 1, dadosVacina);
 }
 
-void removeDoIndex2(int pos, int codigo) {
+void removeDoIndice2(int pos, int codigo) {
     char nome[100];
     int tam;
     int soma = 0;
@@ -526,7 +525,7 @@ void removeVacina(int codigo) {
     while ((cont <= numIndex1) && (!achou)) {
         if (index1[cont].codControle == codigo) {
             achou = true;
-            removeDoIndex2(index1[cont].offset1, codigo);
+            removeDoIndice2(index1[cont].offset1, codigo);
             setInativo(index1[cont].offset1);
             setOffset(index1[cont].offset1);
             index1[cont].codControle = -1;
@@ -542,8 +541,8 @@ void removeVacina(int codigo) {
 }
 
 void menuRemocao() {
-     
     int codigo;
+
     printf("Menu de Remocao de Vacinas\n\n");
     printf("Digite o codigo da vacina a ser removida: (-1 para voltar)\n");
     scanf("%d", &codigo);
@@ -564,33 +563,33 @@ struct ap1Struct encontraRegistro(int pos) {
     fseek(dadosVacina,sizeof(char),1);
 
     fread(&str,tam-1,1,dadosVacina);
-    strtok(str,"|");
+    strtok(str, "|");
     soma = strlen(str) + 1;
     temp = atoi(str);
     temporario.codControle = temp;
 
     fseek(dadosVacina,pos+4+1+soma,0);
     fread(&str,tam-soma-1,1,dadosVacina);
-    strtok(str,"|");
+    strtok(str, "|");
     soma += strlen(str) + 1;
     temp = atoi(str);
     temporario.codCachorro = temp;
 
     fseek(dadosVacina,pos+4+1+soma,0);
     fread(&str,tam-soma-1,1,dadosVacina);
-    strtok(str,"|");
+    strtok(str, "|");
     soma += strlen(str) + 1;
     strcpy(temporario.nomeVacina,str);
 
     fseek(dadosVacina,pos+4+1+soma,0);
     fread(&str,tam-soma-1,1,dadosVacina);
-    strtok(str,"|");
+    strtok(str, "|");
     soma += strlen(str) + 1;
     strcpy(temporario.dataVacina,str);
 
     fseek(dadosVacina,pos+4+1+soma,0);
     fread(&str,tam-soma-1,1,dadosVacina);
-    strtok(str,"|");
+    strtok(str, "|");
     soma += strlen(str) + 1;
     strcpy(temporario.respAplic,str);
 
@@ -761,7 +760,7 @@ void inicializaVetores() {
     }
 }
 
-void imprimirIndex1() {
+void imprimirIndice1() {
     int cont = 0;
 
     while (cont <= numIndex1) {
@@ -772,7 +771,7 @@ void imprimirIndex1() {
     }
 }
 
-void imprimirIndex2() {
+void imprimirIndice2() {
     int cont = 0;
 
     while (cont <= numIndex2) {
@@ -786,7 +785,7 @@ void imprimirIndex2() {
     }
 }
 
-void gravarIndex() {
+void salvarIndice1() {
     fseek(arqIndice1,0,0);
     fwrite("*",1,1,arqIndice1);
 
@@ -801,7 +800,7 @@ void gravarIndex() {
     } 
 }
 
-void gravarIndex2() {
+void salvarIndice2ab() {
     fseek(arqIndice2a,0,0);
     fseek(arqIndice2b,0,0);
 
@@ -1059,8 +1058,8 @@ void compactarDadosVacina() {
     arqIndice1 = fopen("Indice1.dat", "w+b");
     arqIndice2a = fopen("Indice2a.dat", "w+b");
     arqIndice2b = fopen("Indice2b.dat", "w+b");
-    gravarIndex();
-    gravarIndex2();
+    salvarIndice1();
+    salvarIndice2ab();
 
     fseek(arqIndice1,0,0);
     fwrite("*",1,1,arqIndice1);
