@@ -114,9 +114,9 @@ void menu() {
 		printf("[4] Remover dados de vacina\n");
 		printf("[5] Consulta de vacina\n");
 		printf("[6] Compactar arquivo de vacinas (AP1)\n");
-		printf("[7] Sair\n\n");
-		printf("[8] Imprimir Indice 1\n");
-		printf("[9] Imprimir Indice 2\n\n");
+		printf("[7] Exibir Indice 1\n");
+		printf("[8] Exibir Indice 2\n\n");
+		printf("[9] Sair\n\n");
 		printf("Escolha uma opcao: ");
 
 		scanf("%s", &opcao);
@@ -151,14 +151,14 @@ void menu() {
 				printf("Arquivo de vacinas (AP1) compactado com sucesso!\n");
 				break;
 			case '7':
-				printf("Fechando o programa...\n");
-				fim = true;
-				break;
-			case '8':
 				imprimirIndice1();
 				break;
-			case '9':
+			case '8':
 				imprimirIndice2();
+				break;
+			case '9':
+				printf("Fechando o programa...\n");
+				fim = true;
 				break;
 			default:
 				printf("Opcao invalida!");
@@ -426,11 +426,11 @@ void cadastroVacina() {
         }
     } while (buscaCachorro(temporario.codCachorro) == -1);
 
-    printf("Nome da Vacina: ");
+    printf("Nome da vacina: ");
     scanf("%s", &temporario.nomeVacina);
-    printf("Data da Vacinacao: ");
+    printf("Data da vacinacao: ");
     scanf("%s", &temporario.dataVacina);
-    printf("Responsavel pela Aplicacao: ");
+    printf("Responsavel pela aplicacao: ");
     scanf("%s", &temporario.respAplic);
     fseek(arqIndice1, 0, 0);
     fwrite("!", 1, 1, arqIndice1);
@@ -439,9 +439,9 @@ void cadastroVacina() {
 	printf("\n");
 	printf("Dados da vacina:\n");
 	printf("    Codigo da vacina: %d\n", temporario.codControle);
-	printf("    Nome da Vacina: %s\n", temporario.nomeVacina);
-	printf("    Data da Vacinacao: %s\n", temporario.dataVacina);
-	printf("    Responsavel pela Aplicacao: %s\n\n", temporario.respAplic);
+	printf("    Nome da vacina: %s\n", temporario.nomeVacina);
+	printf("    Data da vacinacao: %s\n", temporario.dataVacina);
+	printf("    Responsavel pela aplicacao: %s\n\n", temporario.respAplic);
 
 	fseek(arqCachorros, ((temporario.codCachorro) * sizeof(tempCachorro)), 0);
 	fread(&tempCachorro, sizeof(tempCachorro), 1, arqCachorros);
@@ -459,7 +459,7 @@ void cadastroCachorro() {
     fseek(arqCachorros, 0, 2);
     temporario.codCachorro = ftell(arqCachorros) / sizeof(struct ap2Struct);
 
-    printf("Nome do Cachorro: ");
+    printf("Nome do cachorro: ");
     scanf("%s", temporario.nomeCachorro);
 	printf("Raca: ");
     scanf("%s", temporario.raca);
@@ -470,7 +470,7 @@ void cadastroCachorro() {
 	printf("\n");
 	printf("Dados do cachorro:\n");
     printf("    Codigo do cachorro: %d\n", temporario.codCachorro);
-	printf("    Nome do Cachorro: %s\n", temporario.nomeCachorro);
+	printf("    Nome do cachorro: %s\n", temporario.nomeCachorro);
     printf("    Raca: %s\n\n", temporario.raca);
 }
 
@@ -563,7 +563,7 @@ void removeVacina(int codigo) {
     if (!achou) {
         printf("Nao ha nenhuma vacina de codigo %d cadastrada!\n", codigo);
     } else {
-        printf("Vacina de codigo %d removida!\n", codigo);
+        printf("Vacina referente ao codigo %d removida!\n", codigo);
 	}
 }
 
@@ -706,16 +706,16 @@ void alteraVacina() {
         scanf("%d", &codigo);
         posAlteracao = buscaVacina(codigo);
         if (posAlteracao == -1) {
-            printf("\nNao ha uma vacina cadastrada com esse codigo!\n\n");
+            printf("\nNao ha nenhuma vacina cadastrada com esse codigo!\n\n");
 		}
 
     } while (posAlteracao == -1);
      
     printf("\nAlterar:\n\n");
-    printf("[1] Codigo do Cachorro\n");
-    printf("[2] Nome da Vacina\n");
-    printf("[3] Data da Vacinacao\n");
-    printf("[4] Responsavel pela Aplicacao\n\n");
+    printf("[1] Codigo do cachorro\n");
+    printf("[2] Nome da vacina\n");
+    printf("[3] Data da vacinacao\n");
+    printf("[4] Responsavel pela aplicacao\n\n");
     printf("Escolha uma opcao: ");
     scanf("%d", &menu);
 
@@ -726,22 +726,22 @@ void alteraVacina() {
 
     switch (menu) {
         case 1:
-                printf("\nCodigo do Cachorro: ");
+                printf("\nCodigo do cachorro: ");
                 scanf("%d", &temporario.codCachorro);
                 break;
         case 2:
                 strcpy(nomeAnt, temporario.nomeVacina);
-                printf("\nNome da Vacina: ");
+                printf("\nNome da vacina: ");
                 scanf("%s", &temporario.nomeVacina);
                 atualizaIndex2(nomeAnt, temporario.nomeVacina, temporario.codControle);
                 ordenaIndices();
                 break;
         case 3:
-                printf("\nData da Vacinacao: ");
+                printf("\nData da vacinacao: ");
                 scanf("%s", &temporario.dataVacina);
                 break;
         case 4:
-                printf("\nResponsavel pela Aplicacao: ");
+                printf("\nResponsavel pela aplicacao: ");
                 scanf("%s", &temporario.respAplic);
                 break;
     }
@@ -753,13 +753,7 @@ void alteraVacina() {
         reescreveVacina(temporario, posAlteracao);
     } else {
         adicionarVacina(temporario, true);
-    }
-
-    printf("\nCodigo Controle: %d\n", temporario.codControle);
-    printf("Codigo Cachorro: %d\n", temporario.codCachorro);
-    printf("Nome da Vacina: %s\n", temporario.nomeVacina);
-    printf("Datada Vacinacao: %s\n", temporario.dataVacina);
-    printf("Responsavel pela Aplicacao: %s\n", temporario.respAplic);   
+    }  
 }
 
 void consultaVacina() {
@@ -783,19 +777,19 @@ void consultaVacina() {
 			fread(&str, tam - 1, 1, arqVacinas);
 			strtok(str, "|");
 			soma = strlen(str) + 1;
-			printf("\nCodigo da Vacina: %s", str);
+			printf("\nCodigo da vacina: %s", str);
 
 			fseek(arqVacinas, offsetAP1 + 5 + soma, 0);
 			fread(&str, tam - soma - 1, 1, arqVacinas);
 			strtok(str, "|");
 			soma += strlen(str) + 1;
-			printf("\nCodigo do Cachorro: %s", str);
+			printf("\nCodigo do cachorro: %s", str);
 
 			fseek(arqVacinas, offsetAP1 + 5 + soma, 0);
 			fread(&str, tam - soma - 1, 1, arqVacinas);
 			strtok(str, "|");
 			soma += strlen(str) + 1;
-			printf("\nNome da Vacina: %s", str);
+			printf("\nNome da vacina: %s", str);
 
 			fseek(arqVacinas, offsetAP1 + 5 + soma, 0);
 			fread(&str, tam - soma - 1, 1, arqVacinas);
@@ -807,7 +801,7 @@ void consultaVacina() {
 			fread(&str, tam - soma - 1, 1, arqVacinas);
 			strtok(str, "|");
 			soma += strlen(str) + 1;
-			printf("\nResponsavel pela Aplicacao: %s\n", str);                                                    
+			printf("\nResponsavel pela aplicacao: %s\n", str);                                                    
 		} else {
 			RRN++;
 		}
@@ -915,7 +909,6 @@ void lerIndice2() {
         fread(&offset1, sizeof(int), 1, arqIndice2b);
         contador++;
     }
-
 }
 
 void carregarIndice() {
