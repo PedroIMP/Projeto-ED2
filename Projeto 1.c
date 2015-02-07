@@ -7,7 +7,7 @@
 //                                                                //
 ////////////////////////////////////////////////////////////////////
 
-// Includes
+//	Includes
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -46,17 +46,15 @@ FILE *arqIndice1;
 FILE *arqIndice2a;
 FILE *arqIndice2b;
 
-struct indice1Struct index1[10000];
-struct indice2Struct index2[10000];
+struct indice1Struct index1[5000];
+struct indice2Struct index2[5000];
 int numVacina, numCachorro, numIndex1, numIndex2;
 
 //	ProtÃ³tipos
 
 void menu();
-void menuCadastro();
-void menuRemocao();
-void alteraVacina();
 void menuConsulta();
+void alteraVacina();
 void setInativo();
 void setOffset();
 void compactarDadosVacina();
@@ -100,23 +98,24 @@ int main() {
 	fclose(arqIndice1);
 	fclose(arqIndice2a);
 	fclose(arqIndice2b);
+
 	return 0;
 }
 
 void menu() {
+	int codigo;
 	bool fim = false;
 	do {
 		char opcao;
 
-		printf("Cadastro de vacinas\n\n");
-		printf("[1] Cadastrar nova vacina\n");
-		printf("[2] Alterar dados de vacina existente\n");
-		printf("[3] Remover dados de vacina\n");
-		printf("[4] Cadastrar novo cachorro\n");
-		printf("[5] Remover dados de cachorro\n");
-		printf("[6] Consulta\n");
-		printf("[7] Compactar AP1\n");
-		printf("[8] Sair\n\n");
+		printf("Programa de Cadastro de Vacinas\n\n");
+		printf("[1] Cadastrar novo cachorro\n");
+		printf("[2] Cadastrar nova vacina\n");
+		printf("[3] Alterar dados de vacina existente\n");
+		printf("[4] Remover dados de vacina\n");
+		printf("[5] Consulta de vacina\n");
+		printf("[6] Compactar arquivo de vacinas (AP1)\n");
+		printf("[7] Sair\n\n");
 		printf("Escolha uma opcao: ");
 
 		scanf("%s", &opcao);
@@ -124,28 +123,33 @@ void menu() {
 
 		switch(opcao) {
 			case '1':
-				cadastroVacina();
-				break;
-			case '2':
-				alteraVacina();
-				break;
-			case '3':
-				menuRemocao();
-				break;
-			case '4':
 				cadastroCachorro();
 				break;
-			case '5':
-				menuRemocao();
+			case '2':
+				cadastroVacina();
 				break;
-			case '6':
+			case '3':
+				alteraVacina();
+				break;
+			case '4':
+				printf("Digite o codigo da vacina a ser removida: (-1 para voltar)\n");
+				scanf("%d", &codigo);
+
+				if (codigo != -1) {
+					fseek(arqIndice1, 0, 0);
+					fwrite("*", 1, 1, arqIndice1);
+					removeVacina(codigo);
+				}
+
+				break;
+			case '5':
 				menuConsulta();
 				break;
-			case '7':
+			case '6':
 				compactarDadosVacina();
-				printf("Arquivo de vacinas compactado com sucesso!\n");
+				printf("Arquivo de vacinas (AP1) compactado com sucesso!\n");
 				break;
-			case '8':
+			case '7':
 				printf("Fechando o programa...\n");
 				fim = true;
 				break;
@@ -186,8 +190,8 @@ void inicializaArquivos() {
         arqCachorros = fopen("AP2.dat", "w+b");
         arqVacinas = fopen("AP1.dat", "w+b");
         int n = -1;
-        fwrite(&n,sizeof(int),1,arqVacinas);
-        fwrite(&n,sizeof(int),1,arqVacinas);
+        fwrite(&n, sizeof(int), 1, arqVacinas);
+        fwrite(&n, sizeof(int), 1, arqVacinas);
         arqIndice1 = fopen("Indice1.dat", "w+b");
         arqIndice2a = fopen("Indice2a.dat", "w+b");
         arqIndice2b = fopen("Indice2b.dat", "w+b");
@@ -196,8 +200,8 @@ void inicializaArquivos() {
         if (arqVacinas == NULL) {
             arqVacinas = fopen("AP1.dat", "w+b");
             int n = -1;
-            fwrite(&n,sizeof(int),1,arqVacinas);
-            fwrite(&n,sizeof(int),1,arqVacinas);
+            fwrite(&n, sizeof(int), 1, arqVacinas);
+            fwrite(&n, sizeof(int), 1, arqVacinas);
             arqIndice1 = fopen("Indice1.dat", "w+b");
             arqIndice2a = fopen("Indice2a.dat", "w+b");
             arqIndice2b = fopen("Indice2b.dat", "w+b");
@@ -215,7 +219,7 @@ void inicializaArquivos() {
 					ordenaIndices();
 				} else {
 					char flag;
-					fread(&flag,1,1,arqIndice1);
+					fread(&flag, 1, 1, arqIndice1);
 					if (&flag == "!") {
 						arqIndice1 = fopen("Indice1.dat", "w+b");
 						arqIndice2a = fopen("Indice2a.dat", "r+b");
@@ -383,13 +387,14 @@ int buscaCachorro(int codigo) {
 void cadastroVacina() {
     struct ap1Struct temporario;
     struct ap1Struct temporario2;
+	struct ap2Struct tempCachorro;
     char buffer[105];
 
     temporario.codControle = obterCodigo();
     do {
-        printf("Menu de Cadastro de Vacinas\n\n");
+        printf("Cadastro de Vacina\n\n");
         printf("Codigo da vacina: %d\n\n", temporario.codControle);
-        printf("Codigo Cachorro: ");
+        printf("Digite o codigo do cachorro: ");
         scanf("%d", &temporario.codCachorro);
         if (buscaCachorro(temporario.codCachorro) == -1) {
             printf("\nCachorro nao encontrado!\n\n");
@@ -397,7 +402,7 @@ void cadastroVacina() {
             do {
                 char opcao;
                 fflush(stdin);
-                printf("Deseja cadastrar um cachorro? (1=sim, 0=nao, m=menu:  ");
+                printf("Deseja cadastrar um novo cachorro? (1=Sim, 0=Nao, m=Menu:  ");
                 scanf("%c", &opcao);
                 switch (opcao) {
                     case '1':
@@ -415,25 +420,30 @@ void cadastroVacina() {
             fflush(stdin);
         }
     } while (buscaCachorro(temporario.codCachorro) == -1);
-    printf("\nNome Vacina: ");
+    printf("\nNome da Vacina: ");
     scanf("%s", &temporario.nomeVacina);
-    printf("\nData: ");
+    printf("\nData da Vacinacao: ");
     scanf("%s", &temporario.dataVacina);
     printf("\nResponsavel pela Aplicacao: ");
     scanf("%s", &temporario.respAplic);
-    fseek(arqIndice1,0,0);
+    fseek(arqIndice1, 0, 0);
     fwrite("!", 1, 1, arqIndice1);
     adicionarVacina(temporario, false);
+
+	fseek(arqCachorros, ((temporario.codCachorro)*sizeof(tempCachorro)), 0);
+	fread(&tempCachorro, sizeof(tempCachorro), 1, arqCachorros);
+	printf("Nome: %s\n", tempCachorro.nomeCachorro);
+    printf("Raca: %s\n", tempCachorro.raca);
 }
 
 void cadastroCachorro() {
     struct ap2Struct temporario;
     struct ap2Struct temporario2;
-    printf("Menu de Cadastro de Cachorros\n\n");
+    printf("Cadastro de Cachorro\n\n");
     fseek(arqCachorros, 0, 2);
     temporario.codCachorro = ftell(arqCachorros) / sizeof(struct ap2Struct);
     printf("%d\n", temporario.codCachorro);
-    printf("Nome: ");
+    printf("Nome do Cachorro: ");
     scanf("%s", temporario.nomeCachorro);
     printf("\nRaca: ");
     scanf("%s", temporario.raca);
@@ -441,9 +451,9 @@ void cadastroCachorro() {
     fwrite(&temporario, sizeof(struct ap2Struct), 1, arqCachorros);
     fseek(arqCachorros, -sizeof(struct ap2Struct), 2);
     fread(&temporario2, sizeof(struct ap2Struct), 1, arqCachorros);
-    printf("Codigo: %d\n", temporario2.codCachorro);
+    printf("Codigo do Cachorro: %d\n", temporario2.codCachorro);
     printf("Raca: %s\n", temporario2.raca);
-    printf("Nome: %s\n", temporario2.nomeCachorro);
+    printf("Nome do Cachorro: %s\n", temporario2.nomeCachorro);
 }
 
 void setOffset(int newOffset) {
@@ -539,19 +549,6 @@ void removeVacina(int codigo) {
     } else {
         printf("Vacina %d removida com sucesso!\n", codigo);
 	}
-}
-
-void menuRemocao() {
-    int codigo;
-
-    printf("Menu de Remocao de Vacinas\n\n");
-    printf("Digite o codigo da vacina a ser removida: (-1 para voltar)\n");
-    scanf("%d", &codigo);
-    if (codigo != -1) {
-        fseek(arqIndice1, 0, 0);
-        fwrite("*", 1, 1, arqIndice1);
-        removeVacina(codigo);
-    }
 }
 
 struct ap1Struct encontraRegistro(int pos) {
@@ -698,11 +695,11 @@ void alteraVacina() {
 
     } while (posAlteracao == -1);
      
-    printf("Menu de Alteracao de dados de Vacinacao\n\n");
-    printf("1. Codigo do Cachorro\n");
-    printf("2. Nome da Vacina\n");
-    printf("3. Data da Vacinacao\n");
-    printf("4. Responsavel pela Aplicacao\n");
+    printf("Alteracao de dados de Vacina\n\n");
+    printf("[1] Codigo do Cachorro\n");
+    printf("[2] Nome da Vacina\n");
+    printf("[3] Data da Vacinacao\n");
+    printf("[4] Responsavel pela Aplicacao\n");
     printf("Escolha um campo para alterar: ");
     scanf("%d", &menu);
     temporario = encontraRegistro(posAlteracao);
@@ -756,7 +753,7 @@ void inicializaVetores() {
 
     int i;
 
-    for (i = 0; i <= 10000; i++) {
+    for (i = 0; i <= 5000; i++) {
         index1[i].codControle = -1;
     }
 }
