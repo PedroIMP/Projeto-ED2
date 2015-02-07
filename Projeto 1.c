@@ -55,14 +55,14 @@ FILE *arqIndice2b;
 void menu();
 void consultaVacina();
 void alteraVacina();
-void setInativo();
+void invalidarRegistro();
 void setOffset();
 void compactarDadosVacina();
 void carregarIndice();
 void carregarListaIndice();
 void cadastroCachorro();
-void inicializaVetores();
-void inicializaArquivos();
+void criarVetores();
+void abrirArquivos();
 void cadastroVacina();
 void ordenaIndices();
 int obterCodigo();
@@ -78,8 +78,8 @@ void salvarIndice2ab();
 //	Function principal (main) do programa
 
 int main() {
-	inicializaVetores();
-	inicializaArquivos();
+	criarVetores();
+	abrirArquivos();
 
 	menu();
 
@@ -103,6 +103,7 @@ void menu() {
 	do {
 		char opcao;
 
+		system("cls");
 		printf("///////////////////////////////////////////////\n");
 		printf("//      Programa de Cadastro de Vacinas      //\n");
 		printf("///////////////////////////////////////////////\n\n");
@@ -145,13 +146,14 @@ void menu() {
 			case '6':
 				compactarDadosVacina();
 				printf("Arquivo de vacinas (AP1) compactado com sucesso!\n");
+				system("pause");
 				break;
 			case '7':
 				printf("Fechando o programa...\n");
 				fim = true;
 				break;
 			default:
-				printf("Opcao invalida!");
+				printf("Opcao invalidarRegistro!");
 				menu();
 				break;
 		}
@@ -181,7 +183,7 @@ void ordenaIndices() {
 	}
 }
 
-void inicializaArquivos() {
+void abrirArquivos() {
 	arqCachorros = fopen("AP2.dat", "r+b");
 	if (arqCachorros == NULL) {
 		arqCachorros = fopen("AP2.dat", "w+b");
@@ -324,7 +326,7 @@ void mudaOffset(int codigo, int offset1) {
     while ((contador <= numIndex1) && (!achou)) {
         if (index1[contador].codControle == codigo) {
             achou = true;
-            setInativo(index1[contador].offset1);
+            invalidarRegistro(index1[contador].offset1);
             setOffset(index1[contador].offset1);
             index1[contador].offset1 = offset1;
         }
@@ -388,6 +390,7 @@ void cadastroVacina() {
     temporario.codControle = obterCodigo();
 
     do {
+	   	system("cls");
         printf("Cadastro de Vacina\n\n");
         printf("Digite o codigo do cachorro: ");
         scanf("%d", &temporario.codCachorro);
@@ -408,7 +411,8 @@ void cadastroVacina() {
                         sair = true;
                         break;
 					default:
-						printf("Opcao invalida!");
+						printf("Opcao invalidarRegistro!");
+						system("pause");
 						break;
                 }
             } while (!sair);
@@ -445,6 +449,7 @@ void cadastroVacina() {
 void cadastroCachorro() {
     struct ap2Struct temporario;
 
+	system("cls");
     printf("Cadastro de Cachorro\n\n");
     fseek(arqCachorros, 0, 2);
     temporario.codCachorro = ftell(arqCachorros) / sizeof(struct ap2Struct);
@@ -462,6 +467,7 @@ void cadastroCachorro() {
     printf("    Codigo do cachorro: %d\n", temporario.codCachorro);
 	printf("    Nome do cachorro: %s\n", temporario.nomeCachorro);
     printf("    Raca: %s\n\n", temporario.raca);
+    system("pause");
 }
 
 void setOffset(int newOffset) {
@@ -485,7 +491,7 @@ void setOffset(int newOffset) {
     }
 }
 
-void setInativo(int pos) {
+void invalidarRegistro(int pos) {
     fseek(arqVacinas, (pos + 4), 0);
     fwrite("!", sizeof(char), 1, arqVacinas);
 }
@@ -543,7 +549,7 @@ void removeVacina(int codigo) {
         if (index1[contador].codControle == codigo) {
             achou = true;
             removeDoIndice2(index1[contador].offset1, codigo);
-            setInativo(index1[contador].offset1);
+            invalidarRegistro(index1[contador].offset1);
             setOffset(index1[contador].offset1);
             index1[contador].codControle = -1;
         }
@@ -555,6 +561,7 @@ void removeVacina(int codigo) {
     } else {
         printf("Vacina referente ao codigo %d removida!\n", codigo);
 	}
+	system("pause");
 }
 
 struct ap1Struct encontraRegistro(int pos) {
@@ -690,6 +697,7 @@ void alteraVacina() {
     int menu, codigo, posAlteracao, tam;
     struct ap1Struct temporario;
 
+	system("cls");
     printf("Alterar Dados de Vacina\n\n");
     do {
         printf("Digite o codigo da vacina: ");
@@ -744,6 +752,7 @@ void alteraVacina() {
     } else {
         adicionarVacina(temporario, true);
     }  
+    system("pause");
 }
 
 void consultaVacina() {
@@ -752,6 +761,7 @@ void consultaVacina() {
 	bool achou = 0;
 	char str[100];
 
+	system("cls");
 	printf("Digite o codigo da vacina a ser procurada: ");
 	scanf("%d", &codProcurado);
 
@@ -800,9 +810,10 @@ void consultaVacina() {
 	if (!achou) {
 		printf("Vacina referente ao codigo %d nao encontrada.\n\n", codProcurado);
 	}
+	system("pause");
 }
 
-void inicializaVetores() {
+void criarVetores() {
     numIndex1 = -1;
     numIndex2 = -1;
 
@@ -812,6 +823,7 @@ void inicializaVetores() {
         index1[i].codControle = -1;
     }
 }
+
 
 void salvarIndice1() {
     fseek(arqIndice1, 0, 0);
