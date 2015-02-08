@@ -160,8 +160,6 @@ void menu() {
 			default:
 				printf("Opcao invalida!\n\n");
 				system("pause");
-				menu();
-				break;
 		}
 	} while (!fim);
 }
