@@ -298,6 +298,8 @@ int obterOffset(int tam) {
 	return offset1;
 }
 
+// Function para adicionar um registro ao vetor de Índices
+
 void adicionarIndice(struct ap1Struct aux, int offset1) {
 	numindice1++;
 	indice1[numindice1].codControle = aux.codControle;
@@ -332,6 +334,8 @@ void adicionarIndice(struct ap1Struct aux, int offset1) {
 		indice2[numindice2].offset2 = numindice1;
 	}
 }
+
+// Function para trocar o offset recém reescrito
 
 void trocarOffset(int codigo, int offset1) {
 	bool achou = false;
@@ -496,6 +500,8 @@ void cadastrarCachorro() {
 	system("pause");
 }
 
+// Function para reescrever o offset de um registro
+
 void reescreverOffset(int newOffset) {
 	bool fim = false;
 	int offset1;
@@ -518,14 +524,14 @@ void reescreverOffset(int newOffset) {
 	}
 }
 
-// Function para marcar um registro como disponível
+// Function para marcar um registro como disponível para reuso
 
 void invalidarRegistro(int pos) {
 	fseek(arqVacinas, (pos + 4), 0);
 	fwrite("!", sizeof(char), 1, arqVacinas);
 }
 
-// Function para remover
+// Function para remover do indice secundario
 
 void removerDoIndice2(int pos, int codigo) {
 	char nome[100];
@@ -573,6 +579,8 @@ void removerDoIndice2(int pos, int codigo) {
 	}
 }
 
+// Function para excluir uma vacina
+
 void excluirVacina(int codigo) {
 	bool achou = false;
 	int contador = 0;
@@ -595,6 +603,8 @@ void excluirVacina(int codigo) {
 	}
 	system("pause");
 }
+
+// Function para encontrar um registro e retorná-lo como saída
 
 struct ap1Struct encontraRegistro(int pos) {
 	struct ap1Struct temporario;
@@ -639,6 +649,8 @@ struct ap1Struct encontraRegistro(int pos) {
 	return temporario;
 }
 
+// Function para buscar uma vacina no vetor de Índices
+
 int buscarVacina(int codigo) {
 	int contador = 0;
 
@@ -652,6 +664,8 @@ int buscarVacina(int codigo) {
 	return -1;
 }
 
+// Function para calcular o tamanho de um registro
+
 int calcularTamanhoRegistro(struct ap1Struct temporario) {
 	char buffer[105];
 
@@ -659,6 +673,8 @@ int calcularTamanhoRegistro(struct ap1Struct temporario) {
 
 	return strlen(buffer);
 }
+
+// Function para escrever as alterações da vacina no Arquivo de Vacinas (AP1)
 
 void reescreverVacina(struct ap1Struct temporario, int offset1) {
 	char buffer[105];
@@ -668,6 +684,8 @@ void reescreverVacina(struct ap1Struct temporario, int offset1) {
 	fseek(arqVacinas, offset1 + sizeof(int), 0);
 	fwrite(buffer, sizeof(char), strlen(buffer), arqVacinas);
 }
+
+// Function para atualizar o Indice secundário
 
 void atualizarIndice2(char *nomeAnt, char *nome, int codigo) {
 	int contador = 0;
@@ -729,6 +747,8 @@ void atualizarIndice2(char *nomeAnt, char *nome, int codigo) {
 
 	indice1[ref].offset2 = -1;
 }
+
+// Function para alterar os dados de uma vacina
 
 void alterarVacina() {
 	int codigo, posAlteracao, tam;
@@ -912,33 +932,8 @@ void salvarIndice2ab() {
 	}
 }
 
-void lerIndice2() {
-	fseek(arqIndice2a, 0, 2);
-	int tamArq = ftell(arqIndice2a) / 44;
-	fseek(arqIndice2a, 0, 0);
-	struct indice2Struct temporario;
 
-	int contador = 0;
-
-	while (contador < tamArq) {
-		fread(&temporario, sizeof(temporario), 1, arqIndice2a);
-
-		contador++;
-	}
-
-	fseek(arqIndice2b, 0, 2);
-	tamArq = ftell(arqIndice2b) / 8;
-	fseek(arqIndice2b, 0, 0);
-
-	contador = 0;
-	int codigo, offset1;
-
-	while (contador < tamArq) {
-		fread(&codigo, sizeof(int), 1, arqIndice2b);
-		fread(&offset1, sizeof(int), 1, arqIndice2b);
-		contador++;
-	}
-}
+// Function para criar o índice a partir do Arquivo de Vacinas (AP1)
 
 void completarIndice() {
 	fseek(arqIndice2a, 0, 2);
@@ -984,6 +979,8 @@ void completarIndice() {
 		contador++;
 	}
 }
+
+// Function para carregar o índice do disco para a RAM
 
 void completarListaIndice() {
 	int pos = 8;
