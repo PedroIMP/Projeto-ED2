@@ -159,6 +159,7 @@ void menu() {
 				break;
 			default:
 				printf("Opcao invalida!\n\n");
+				system("pause");
 				menu();
 				break;
 		}
@@ -773,6 +774,7 @@ void alterarVacina() {
                 break;
 		default:
 				printf("Opcao invalida!\n\n");
+				system("pause");
 				break;
     }
 
